@@ -83,6 +83,11 @@ else
     LOCAL_CFLAGS += -DPRESENT_TIME_OFFSET_FROM_VSYNC_NS=0
 endif
 
+# psw0523 add for pyrope
+ifeq ($(TARGET_BOARD_PLATFORM), pyrope)
+	LOCAL_CFLAGS += -DPATCH_FOR_PYROPE
+endif
+
 LOCAL_CFLAGS += -fvisibility=hidden
 
 LOCAL_SHARED_LIBRARIES := \

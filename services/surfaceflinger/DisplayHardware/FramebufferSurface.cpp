@@ -58,11 +58,35 @@ FramebufferSurface::FramebufferSurface(HWComposer& hwc, int disp,
     mCurrentBuffer(0),
     mHwc(hwc)
 {
+    // psw0523 fix
+#ifdef PATCH_FOR_PYROPE
+    if (mDisplayType == HWC_DISPLAY_PRIMARY)
+        mName = "FramebufferSurface0";
+    else
+        mName = "FramebufferSurface1";
+#else
     mName = "FramebufferSurface";
+#endif
+    // end psw0523
+
     mConsumer->setConsumerName(mName);
+
+    // psw0523 fix
+#ifdef PATCH_FOR_PYROPE
+    if (mDisplayType == HWC_DISPLAY_PRIMARY) {
+        mConsumer->setConsumerUsageBits(GRALLOC_USAGE_HW_FB |
+                GRALLOC_USAGE_HW_RENDER |
+                GRALLOC_USAGE_HW_COMPOSER);
+    } else {
+        mConsumer->setConsumerUsageBits(GRALLOC_USAGE_HW_RENDER |
+                GRALLOC_USAGE_HW_COMPOSER);
+    }
+#else
     mConsumer->setConsumerUsageBits(GRALLOC_USAGE_HW_FB |
                                        GRALLOC_USAGE_HW_RENDER |
                                        GRALLOC_USAGE_HW_COMPOSER);
+#endif
+    // end psw0523
     mConsumer->setDefaultBufferFormat(mHwc.getFormat(disp));
     mConsumer->setDefaultBufferSize(mHwc.getWidth(disp),  mHwc.getHeight(disp));
     mConsumer->setDefaultMaxBufferCount(NUM_FRAMEBUFFER_SURFACE_BUFFERS);

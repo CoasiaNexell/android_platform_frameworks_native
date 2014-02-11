@@ -776,7 +776,18 @@ bool HWComposer::supportsFramebufferTarget() const {
 int HWComposer::fbPost(int32_t id,
         const sp<Fence>& acquireFence, const sp<GraphicBuffer>& buffer) {
     if (mHwc && hwcHasApiVersion(mHwc, HWC_DEVICE_API_VERSION_1_1)) {
+        // psw0523 fix
+#ifdef PATCH_FOR_PYROPE
+        status_t ret = setFramebufferTarget(id, acquireFence, buffer);
+        if (ret != NO_ERROR)
+            return ret;
+        if (id == 0)
+            commit();
+        return NO_ERROR;
+#else
         return setFramebufferTarget(id, acquireFence, buffer);
+#endif
+        // end psw0523
     } else {
         acquireFence->waitForever("HWComposer::fbPost");
         return mFbDev->post(mFbDev, buffer->handle);

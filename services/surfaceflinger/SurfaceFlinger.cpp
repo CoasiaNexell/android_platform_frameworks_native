@@ -831,7 +831,11 @@ void SurfaceFlinger::onVSyncReceived(int type, nsecs_t timestamp) {
     if (needsHwVsync) {
         enableHardwareVsync();
     } else {
+        // psw0523 fix
+#ifndef PATCH_FOR_PYROPE
         disableHardwareVsync(false);
+#endif
+        // end psw0523
     }
 }
 
@@ -1139,7 +1143,14 @@ void SurfaceFlinger::postFramebuffer()
             //    for the current rendering API."
             getDefaultDisplayDevice()->makeCurrent(mEGLDisplay, mEGLContext);
         }
+        // psw0523 fix
+#ifdef PATCH_FOR_PYROPE
+        if (!hwc.hasGlesComposition(0) && !hwc.getForceSwapBuffers(0))
+            hwc.commit();
+#else
         hwc.commit();
+#endif
+        // end psw0523
     }
 
     // make the default display current because the VirtualDisplayDevice code cannot
@@ -1708,6 +1719,12 @@ void SurfaceFlinger::doComposeSurfaces(const sp<const DisplayDevice>& hw, const 
 
     bool hasGlesComposition = hwc.hasGlesComposition(id);
     if (hasGlesComposition) {
+        // psw0523 add
+#ifdef PATCH_FOR_PYROPE
+        hwc.setBeforeGlesComposite(id, true);
+        hwc.setForceSwapBuffers(id, false);
+#endif
+        // end psw0523
         if (!hw->makeCurrent(mEGLDisplay, mEGLContext)) {
             ALOGW("DisplayDevice::makeCurrent failed. Aborting surface composition for display %s",
                   hw->getDisplayName().string());
@@ -1763,6 +1780,26 @@ void SurfaceFlinger::doComposeSurfaces(const sp<const DisplayDevice>& hw, const 
             }
         }
     }
+    // psw0523 add
+#ifdef PATCH_FOR_PYROPE
+    else {
+        if (hwc.hasHwcComposition(id) && hwc.getBeforeGlesComposite(id)) {
+            ALOGD("psw0523===> clear FB by GL!!!");
+
+            RenderEngine& engine(getRenderEngine());
+
+            hw->makeCurrent(mEGLDisplay, mEGLContext);
+            hw->setViewportAndProjection();
+            engine.clearWithColor(0, 0, 0, 0);
+
+            hwc.setForceSwapBuffers(id, true);
+        } else {
+            hwc.setForceSwapBuffers(id, false);
+        }
+        hwc.setBeforeGlesComposite(id, false);
+    }
+#endif
+    // end psw0523
 
     /*
      * and then, render the layers targeted at the framebuffer
