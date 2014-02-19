@@ -2309,6 +2309,8 @@ void SurfaceFlinger::unblank(const sp<IBinder>& display) {
 }
 
 void SurfaceFlinger::blank(const sp<IBinder>& display) {
+    // psw0523 fix
+#ifndef PATCH_FOR_PYROPE
     class MessageScreenReleased : public MessageBase {
         SurfaceFlinger& mFlinger;
         sp<IBinder> mDisplay;
@@ -2329,6 +2331,7 @@ void SurfaceFlinger::blank(const sp<IBinder>& display) {
     };
     sp<MessageBase> msg = new MessageScreenReleased(*this, display);
     postMessageSync(msg);
+#endif
 }
 
 // ---------------------------------------------------------------------------
