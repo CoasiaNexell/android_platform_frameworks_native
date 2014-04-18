@@ -445,6 +445,12 @@ void DisplayDevice::setProjection(int orientation,
     const uint8_t type = mGlobalTransform.getType();
     mNeedsFiltering = (!mGlobalTransform.preserveRects() ||
             (type >= Transform::SCALE));
+    // psw0523 test
+    //if (mDisplayWidth == 1920) {
+        //ALOGD("Force set mNeedsFiltering");
+        mNeedsFiltering = true;
+    //}
+    // end psw0523
 
     mScissor = mGlobalTransform.transform(viewport);
     if (mScissor.isEmpty()) {
