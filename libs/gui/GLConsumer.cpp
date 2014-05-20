@@ -418,6 +418,10 @@ status_t GLConsumer::updateAndReleaseLocked(const BufferQueue::BufferItem& item)
     mCurrentTextureBuf = mSlots[buf].mGraphicBuffer;
     mCurrentCrop = item.mCrop;
     mCurrentTransform = item.mTransform;
+    // psw0523 add for miracast sink
+    if (mName == "A Miracast Sink Surface")
+        mCurrentTransform |= 0x04;
+    // end psw0523
     mCurrentScalingMode = item.mScalingMode;
     mCurrentTimestamp = item.mTimestamp;
     mCurrentFence = item.mFence;
