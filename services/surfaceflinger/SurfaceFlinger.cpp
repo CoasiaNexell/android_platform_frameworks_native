@@ -1145,7 +1145,12 @@ void SurfaceFlinger::postFramebuffer()
         }
         // psw0523 fix
 #ifdef PATCH_FOR_PYROPE
+#if 0
+        if ((!hwc.hasGlesComposition(0) && !hwc.getForceSwapBuffers(0)) ||
+            (!hwc.hasGlesComposition(1) && !hwc.getForceSwapBuffers(1)))
+#else
         if (!hwc.hasGlesComposition(0) && !hwc.getForceSwapBuffers(0))
+#endif
             hwc.commit();
 #else
         hwc.commit();
@@ -1784,14 +1789,10 @@ void SurfaceFlinger::doComposeSurfaces(const sp<const DisplayDevice>& hw, const 
 #ifdef PATCH_FOR_PYROPE
     else {
         if (hwc.hasHwcComposition(id) && hwc.getBeforeGlesComposite(id)) {
-            ALOGD("psw0523===> clear FB by GL!!!");
-
-            RenderEngine& engine(getRenderEngine());
-
+            ALOGD("psw0523===> clear FB by GL : id %d!!!", id);
             hw->makeCurrent(mEGLDisplay, mEGLContext);
-            hw->setViewportAndProjection();
+            RenderEngine& engine(getRenderEngine());
             engine.clearWithColor(0, 0, 0, 0);
-
             hwc.setForceSwapBuffers(id, true);
         } else {
             hwc.setForceSwapBuffers(id, false);
