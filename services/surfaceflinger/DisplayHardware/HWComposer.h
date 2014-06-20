@@ -93,6 +93,10 @@ public:
     // Asks the HAL what it can do
     status_t prepare();
 
+#ifdef PATCH_FOR_PYROPE
+    status_t wait_commit();
+#endif
+
     // commits the list
     status_t commit();
 

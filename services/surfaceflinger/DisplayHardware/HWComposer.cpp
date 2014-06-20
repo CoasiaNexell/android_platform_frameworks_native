@@ -587,6 +587,15 @@ status_t HWComposer::setFramebufferTarget(int32_t id,
     return NO_ERROR;
 }
 
+#ifdef PATCH_FOR_PYROPE
+status_t HWComposer::wait_commit() {
+    int (*wait_commit)(struct hwc_composer_device_1 *) = (int (*)(struct hwc_composer_device_1 *))mHwc->reserved_proc[0];
+    if (wait_commit)
+        return wait_commit(mHwc);
+    return 0;
+}
+#endif
+
 status_t HWComposer::prepare() {
     for (size_t i=0 ; i<mNumDisplays ; i++) {
         DisplayData& disp(mDisplayData[i]);
@@ -776,18 +785,18 @@ bool HWComposer::supportsFramebufferTarget() const {
 int HWComposer::fbPost(int32_t id,
         const sp<Fence>& acquireFence, const sp<GraphicBuffer>& buffer) {
     if (mHwc && hwcHasApiVersion(mHwc, HWC_DEVICE_API_VERSION_1_1)) {
-        // psw0523 fix
 #ifdef PATCH_FOR_PYROPE
         status_t ret = setFramebufferTarget(id, acquireFence, buffer);
         if (ret != NO_ERROR)
             return ret;
-        if (id == 0)
+        if (id == 0 && hasGlesComposition(0)) {
+            ALOGD("commit2");
             commit();
+        }
         return NO_ERROR;
 #else
         return setFramebufferTarget(id, acquireFence, buffer);
 #endif
-        // end psw0523
     } else {
         acquireFence->waitForever("HWComposer::fbPost");
         return mFbDev->post(mFbDev, buffer->handle);

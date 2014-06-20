@@ -1143,20 +1143,19 @@ void SurfaceFlinger::postFramebuffer()
             //    for the current rendering API."
             getDefaultDisplayDevice()->makeCurrent(mEGLDisplay, mEGLContext);
         }
-        // psw0523 fix
 #ifdef PATCH_FOR_PYROPE
-#if 0
-        if ((!hwc.hasGlesComposition(0) && !hwc.getForceSwapBuffers(0)) ||
-            (!hwc.hasGlesComposition(1) && !hwc.getForceSwapBuffers(1)))
-#else
-        if (!hwc.hasGlesComposition(0) && !hwc.getForceSwapBuffers(0))
-#endif
+        if (!hwc.hasGlesComposition(0))
             hwc.commit();
 #else
         hwc.commit();
 #endif
-        // end psw0523
     }
+
+#ifdef PATCH_FOR_PYROPE
+    if (hwc.hasGlesComposition(0)) {
+         hwc.wait_commit();
+    }
+#endif
 
     // make the default display current because the VirtualDisplayDevice code cannot
     // deal with dequeueBuffer() being called outside of the composition loop; however
