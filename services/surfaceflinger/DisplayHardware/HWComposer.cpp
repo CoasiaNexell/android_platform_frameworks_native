@@ -790,7 +790,6 @@ int HWComposer::fbPost(int32_t id,
         if (ret != NO_ERROR)
             return ret;
         if (id == 0 && hasGlesComposition(0)) {
-            ALOGD("commit2");
             commit();
         }
         return NO_ERROR;
