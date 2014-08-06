@@ -451,14 +451,12 @@ void DisplayDevice::setProjection(int orientation,
     mGlobalTransform = R * TP * S * TL;
 
     const uint8_t type = mGlobalTransform.getType();
+#ifndef PATCH_FOR_PYROPE
     mNeedsFiltering = (!mGlobalTransform.preserveRects() ||
             (type >= Transform::SCALE));
-    // psw0523 test
-    //if (mDisplayWidth == 1920) {
-        //ALOGD("Force set mNeedsFiltering");
-        mNeedsFiltering = true;
-    //}
-    // end psw0523
+#else
+    mNeedsFiltering = true;
+#endif
 
     mScissor = mGlobalTransform.transform(viewport);
     if (mScissor.isEmpty()) {
