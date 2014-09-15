@@ -83,12 +83,17 @@ else
     LOCAL_CFLAGS += -DPRESENT_TIME_OFFSET_FROM_VSYNC_NS=0
 endif
 
-# psw0523 add for pyrope
-ifeq ($(TARGET_BOARD_PLATFORM), pyrope)
-	LOCAL_CFLAGS += -DPATCH_FOR_PYROPE
-endif
 
 LOCAL_CFLAGS += -fvisibility=hidden
+
+# psw0523 add for pyrope
+ifeq ($(TARGET_BOARD_PLATFORM), pyrope)
+	LOCAL_CFLAGS += -DPATCH_FOR_PYROPE -DDEBUG_LAYER
+	# for debugging
+	#LOCAL_C_INCLUDES += hardware/nexell/pyrope/include system/core/include
+	LOCAL_C_INCLUDES += hardware/nexell/pyrope/include
+	#LOCAL_C_FLAGS += -DDEBUG_LAYER
+endif
 
 LOCAL_SHARED_LIBRARIES := \
 	libcutils \
@@ -102,6 +107,10 @@ LOCAL_SHARED_LIBRARIES := \
 	libbinder \
 	libui \
 	libgui
+
+ifeq ($(TARGET_BOARD_PLATFORM), pyrope)
+	LOCAL_SHARED_LIBRARIES += libion libion-nexell
+endif
 
 LOCAL_MODULE:= libsurfaceflinger
 

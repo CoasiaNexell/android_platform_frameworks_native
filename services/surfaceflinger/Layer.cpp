@@ -937,6 +937,15 @@ bool Layer::isVisible() const {
             && (mActiveBuffer != NULL);
 }
 
+// psw0523 add for debugging
+#ifdef DEBUG_LAYER
+#include <ion/ion.h>
+#include <linux/ion.h>
+#include <linux/nxp_ion.h>
+#include <ion-private.h>
+#include <gralloc_priv.h>
+#endif
+// end psw0523
 Region Layer::latchBuffer(bool& recomputeVisibleRegions)
 {
     ATRACE_CALL();
@@ -1098,6 +1107,37 @@ Region Layer::latchBuffer(bool& recomputeVisibleRegions)
              // geometry invalidation.
             recomputeVisibleRegions = true;
          }
+
+// psw0523 add for debugging
+#ifdef DEBUG_LAYER
+        {
+            // here
+            static int ion_fd = -1;
+            if (ion_fd < 0) {
+                ion_fd = ion_open();
+                if (ion_fd < 0) {
+                     ALOGE("can't open ion device");
+                }
+            }
+
+            if (ion_fd >= 0) {
+                ANativeWindowBuffer *anwb = mActiveBuffer->getNativeBuffer();
+                private_handle_t const *handle = reinterpret_cast<private_handle_t const *>(anwb->handle);
+                unsigned long phys;
+                ion_get_phys(ion_fd, handle->share_fd, &phys);
+                ALOGD("CURBUF: (%dx%d), phys: 0x%x, format: 0x%x",
+                        mActiveBuffer->getWidth(), mActiveBuffer->getHeight(), phys, handle->format);
+
+                if (oldActiveBuffer != NULL) {
+                    ANativeWindowBuffer *old_anwb = oldActiveBuffer->getNativeBuffer();
+                    private_handle_t const *old_handle = reinterpret_cast<private_handle_t const *>(old_anwb->handle);
+                    ion_get_phys(ion_fd, old_handle->share_fd, &phys);
+                    ALOGD("OLDBUF: (%dx%d), phys: 0x%x, format: 0x%x",
+                            oldActiveBuffer->getWidth(), oldActiveBuffer->getHeight(), phys, old_handle->format);
+                }
+            }
+        }
+#endif
 
         Rect crop(mSurfaceFlingerConsumer->getCurrentCrop());
         const uint32_t transform(mSurfaceFlingerConsumer->getCurrentTransform());
