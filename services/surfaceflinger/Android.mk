@@ -86,6 +86,16 @@ endif
 LOCAL_CFLAGS += -fvisibility=hidden -Werror=format
 LOCAL_CFLAGS += -std=c++11
 
+# psw0523 add for pyrope
+ifeq ($(TARGET_BOARD_PLATFORM), pyrope)
+	LOCAL_CFLAGS += -DPATCH_FOR_PYROPE
+	#LOCAL_CFLAGS += -DPATCH_FOR_PYROPE -DDEBUG_LAYER
+	# for debugging
+	#LOCAL_C_INCLUDES += hardware/nexell/pyrope/include system/core/include
+	#LOCAL_C_INCLUDES += hardware/nexell/pyrope/include
+	#LOCAL_C_FLAGS += -DDEBUG_LAYER
+endif
+
 LOCAL_SHARED_LIBRARIES := \
 	libcutils \
 	liblog \

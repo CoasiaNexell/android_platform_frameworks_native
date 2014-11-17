@@ -1144,8 +1144,18 @@ void SurfaceFlinger::postFramebuffer()
             //    for the current rendering API."
             getDefaultDisplayDevice()->makeCurrent(mEGLDisplay, mEGLContext);
         }
+#ifdef PATCH_FOR_PYROPE
+        if (!hwc.hasGlesComposition(0))
+            hwc.commit();
+#else
         hwc.commit();
+#endif
     }
+
+#ifdef PATCH_FOR_PYROPE
+    if (hwc.hasGlesComposition(0))
+        hwc.wait_commit();
+#endif
 
     // make the default display current because the VirtualDisplayDevice code cannot
     // deal with dequeueBuffer() being called outside of the composition loop; however
@@ -1772,6 +1782,12 @@ bool SurfaceFlinger::doComposeSurfaces(const sp<const DisplayDevice>& hw, const 
 
     bool hasGlesComposition = hwc.hasGlesComposition(id);
     if (hasGlesComposition) {
+
+#ifdef PATCH_FOR_PYROPE
+        hwc.setBeforeGlesComposite(id, true);
+        hwc.setForceSwapBuffers(id, false);
+#endif
+
         if (!hw->makeCurrent(mEGLDisplay, mEGLContext)) {
             ALOGW("DisplayDevice::makeCurrent failed. Aborting surface composition for display %s",
                   hw->getDisplayName().string());
@@ -1831,6 +1847,20 @@ bool SurfaceFlinger::doComposeSurfaces(const sp<const DisplayDevice>& hw, const 
             }
         }
     }
+#ifdef PATCH_FOR_PYROPE
+    else {
+        if (hwc.hasHwcComposition(id) && hwc.getBeforeGlesComposite(id)) {
+            ALOGD("psw0523===> clear FB by GL : id %d!!!", id);
+            hw->makeCurrent(mEGLDisplay, mEGLContext);
+            RenderEngine& engine(getRenderEngine());
+            engine.clearWithColor(0, 0, 0, 0);
+            hwc.setForceSwapBuffers(id, true);
+        } else {
+            hwc.setForceSwapBuffers(id, false);
+        }
+        hwc.setBeforeGlesComposite(id, false);
+    }
+#endif
 
     /*
      * and then, render the layers targeted at the framebuffer
