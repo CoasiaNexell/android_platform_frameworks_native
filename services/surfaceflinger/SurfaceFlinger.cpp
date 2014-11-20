@@ -832,7 +832,7 @@ void SurfaceFlinger::onVSyncReceived(int type, nsecs_t timestamp) {
         enableHardwareVsync();
     } else {
         // psw0523 fix
-#ifndef PATCH_FOR_PYROPE
+#ifndef PATCH_FOR_SLSIAP
         disableHardwareVsync(false);
 #endif
         // end psw0523
@@ -1143,7 +1143,7 @@ void SurfaceFlinger::postFramebuffer()
             //    for the current rendering API."
             getDefaultDisplayDevice()->makeCurrent(mEGLDisplay, mEGLContext);
         }
-#ifdef PATCH_FOR_PYROPE
+#ifdef PATCH_FOR_SLSIAP
         if (!hwc.hasGlesComposition(0))
             hwc.commit();
 #else
@@ -1151,7 +1151,7 @@ void SurfaceFlinger::postFramebuffer()
 #endif
     }
 
-#ifdef PATCH_FOR_PYROPE
+#ifdef PATCH_FOR_SLSIAP
     if (hwc.hasGlesComposition(0)) {
          hwc.wait_commit();
     }
@@ -1724,7 +1724,7 @@ void SurfaceFlinger::doComposeSurfaces(const sp<const DisplayDevice>& hw, const 
     bool hasGlesComposition = hwc.hasGlesComposition(id);
     if (hasGlesComposition) {
         // psw0523 add
-#ifdef PATCH_FOR_PYROPE
+#ifdef PATCH_FOR_SLSIAP
         hwc.setBeforeGlesComposite(id, true);
         hwc.setForceSwapBuffers(id, false);
 #endif
@@ -1785,7 +1785,7 @@ void SurfaceFlinger::doComposeSurfaces(const sp<const DisplayDevice>& hw, const 
         }
     }
     // psw0523 add
-#ifdef PATCH_FOR_PYROPE
+#ifdef PATCH_FOR_SLSIAP
     else {
         if (hwc.hasHwcComposition(id) && hwc.getBeforeGlesComposite(id)) {
             ALOGD("psw0523===> clear FB by GL : id %d!!!", id);
@@ -2310,7 +2310,7 @@ void SurfaceFlinger::unblank(const sp<IBinder>& display) {
 
 void SurfaceFlinger::blank(const sp<IBinder>& display) {
     // psw0523 fix
-#ifndef PATCH_FOR_PYROPE
+#ifndef PATCH_FOR_SLSIAP
     class MessageScreenReleased : public MessageBase {
         SurfaceFlinger& mFlinger;
         sp<IBinder> mDisplay;

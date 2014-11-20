@@ -93,7 +93,7 @@ public:
     // Asks the HAL what it can do
     status_t prepare();
 
-#ifdef PATCH_FOR_PYROPE
+#ifdef PATCH_FOR_SLSIAP
     status_t wait_commit();
 #endif
 
@@ -148,7 +148,7 @@ public:
     sp<Fence> getLastRetireFence(int32_t id);
 
     // psw0523 add for nexell hwcomposer use video layer
-#ifdef PATCH_FOR_PYROPE
+#ifdef PATCH_FOR_SLSIAP
     void setBeforeGlesComposite(int32_t id, bool isGles) {
         mBeforeGlesComposite[id] = isGles;
     }
@@ -376,7 +376,7 @@ private:
     mutable Mutex mEventControlLock;
 
     // psw0523 add for nexell hwcomposer use video layer
-#ifdef PATCH_FOR_PYROPE
+#ifdef PATCH_FOR_SLSIAP
     bool mBeforeGlesComposite[MAX_HWC_DISPLAYS];
     bool mForceSwapBuffers[MAX_HWC_DISPLAYS];
 #endif

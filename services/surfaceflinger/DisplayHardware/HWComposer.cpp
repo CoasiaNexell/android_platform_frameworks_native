@@ -587,7 +587,7 @@ status_t HWComposer::setFramebufferTarget(int32_t id,
     return NO_ERROR;
 }
 
-#ifdef PATCH_FOR_PYROPE
+#ifdef PATCH_FOR_SLSIAP
 status_t HWComposer::wait_commit() {
     int (*wait_commit)(struct hwc_composer_device_1 *) = (int (*)(struct hwc_composer_device_1 *))mHwc->reserved_proc[0];
     if (wait_commit)
@@ -785,7 +785,7 @@ bool HWComposer::supportsFramebufferTarget() const {
 int HWComposer::fbPost(int32_t id,
         const sp<Fence>& acquireFence, const sp<GraphicBuffer>& buffer) {
     if (mHwc && hwcHasApiVersion(mHwc, HWC_DEVICE_API_VERSION_1_1)) {
-#ifdef PATCH_FOR_PYROPE
+#ifdef PATCH_FOR_SLSIAP
         status_t ret = setFramebufferTarget(id, acquireFence, buffer);
         if (ret != NO_ERROR)
             return ret;

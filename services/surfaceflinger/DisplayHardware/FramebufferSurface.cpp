@@ -59,7 +59,7 @@ FramebufferSurface::FramebufferSurface(HWComposer& hwc, int disp,
     mHwc(hwc)
 {
     // psw0523 fix
-#ifdef PATCH_FOR_PYROPE
+#ifdef PATCH_FOR_SLSIAP
     if (mDisplayType == HWC_DISPLAY_PRIMARY)
         mName = "FramebufferSurface0";
     else
@@ -72,7 +72,7 @@ FramebufferSurface::FramebufferSurface(HWComposer& hwc, int disp,
     mConsumer->setConsumerName(mName);
 
     // psw0523 fix
-#ifdef PATCH_FOR_PYROPE
+#ifdef PATCH_FOR_SLSIAP
     if (mDisplayType == HWC_DISPLAY_PRIMARY) {
         mConsumer->setConsumerUsageBits(GRALLOC_USAGE_HW_FB |
                 GRALLOC_USAGE_HW_RENDER |

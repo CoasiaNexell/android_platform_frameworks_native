@@ -86,13 +86,13 @@ endif
 
 LOCAL_CFLAGS += -fvisibility=hidden
 
-# psw0523 add for pyrope
-ifeq ($(TARGET_BOARD_PLATFORM), pyrope)
-	LOCAL_CFLAGS += -DPATCH_FOR_PYROPE
-	#LOCAL_CFLAGS += -DPATCH_FOR_PYROPE -DDEBUG_LAYER
+# psw0523 add for slsiap
+ifeq ($(TARGET_BOARD_PLATFORM), slsiap)
+	LOCAL_CFLAGS += -DPATCH_FOR_SLSIAP
+	#LOCAL_CFLAGS += -DPATCH_FOR_SLSIAP -DDEBUG_LAYER
 	# for debugging
-	#LOCAL_C_INCLUDES += hardware/nexell/pyrope/include system/core/include
-	#LOCAL_C_INCLUDES += hardware/nexell/pyrope/include
+	#LOCAL_C_INCLUDES += hardware/samsung_slsi/pyrope/include system/core/include
+	#LOCAL_C_INCLUDES += hardware/samsung_slsi/pyrope/include
 	#LOCAL_C_FLAGS += -DDEBUG_LAYER
 endif
 

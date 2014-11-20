@@ -230,7 +230,7 @@ void DisplayDevice::swapBuffers(HWComposer& hwc) const {
     //    (b) this is a virtual display
 
     // psw0523 fix
-#ifdef PATCH_FOR_PYROPE
+#ifdef PATCH_FOR_SLSIAP
     if ((hwc.initCheck() != NO_ERROR) ||
         ((hwc.hasGlesComposition(mHwcDisplayId) || hwc.getForceSwapBuffers(mType)) &&
          (hwc.supportsFramebufferTarget() || mType >= DISPLAY_VIRTUAL))) {
@@ -451,7 +451,7 @@ void DisplayDevice::setProjection(int orientation,
     mGlobalTransform = R * TP * S * TL;
 
     const uint8_t type = mGlobalTransform.getType();
-#ifndef PATCH_FOR_PYROPE
+#ifndef PATCH_FOR_SLSIAP
     mNeedsFiltering = (!mGlobalTransform.preserveRects() ||
             (type >= Transform::SCALE));
 #else
