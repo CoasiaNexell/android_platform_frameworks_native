@@ -57,7 +57,7 @@ ifeq ($(TARGET_BOARD_PLATFORM), tegra3)
 endif
 
 # psw0523 add
-ifeq ($(TARGET_BOARD_PLATFORM), pyrope)
+ifeq ($(TARGET_BOARD_PLATFORM), slsiap)
 	LOCAL_CFLAGS += -DDONT_USE_FENCE_SYNC
 endif
 # end psw0523
