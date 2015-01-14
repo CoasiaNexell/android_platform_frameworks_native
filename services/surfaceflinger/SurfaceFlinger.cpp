@@ -115,10 +115,15 @@ static const bool runningWithoutSyncFramework = false;
 // the latency will end up being an additional vsync period, and animations
 // will hiccup.  Therefore, this latency should be tuned somewhat
 // conservatively (or at least with awareness of the trade-off being made).
+// psw0523 test
 static const int64_t vsyncPhaseOffsetNs = VSYNC_EVENT_PHASE_OFFSET_NS;
+//static const int64_t vsyncPhaseOffsetNs = -16500000/2;
 
 // This is the phase offset at which SurfaceFlinger's composition runs.
+// psw0523 test
 static const int64_t sfVsyncPhaseOffsetNs = SF_VSYNC_EVENT_PHASE_OFFSET_NS;
+//static const int64_t sfVsyncPhaseOffsetNs = 16500000/2 + 8250000;
+//static const int64_t sfVsyncPhaseOffsetNs = -16500000/2;
 
 // ---------------------------------------------------------------------------
 
@@ -462,6 +467,8 @@ public:
             }
             ATRACE_INT("VsyncOn", 1);
         } else {
+            // psw0523 debugging
+            ALOGD("setVSyncEnabled call removeEventListener");
             status_t err = mDispSync->removeEventListener(
                     static_cast<DispSync::Callback*>(this));
             if (err != NO_ERROR) {
@@ -491,7 +498,13 @@ private:
         }
 
         if (callback != NULL) {
+            // psw0523 debugging
+            //ALOGD("call onVSyncEvent");
             callback->onVSyncEvent(when);
+        }
+        // psw0523 debugging
+        else {
+            ALOGD("NO Callback!");
         }
     }
 
@@ -809,6 +822,8 @@ void SurfaceFlinger::disableHardwareVsync(bool makeUnavailable) {
     Mutex::Autolock _l(mHWVsyncLock);
     if (mPrimaryHWVsyncEnabled) {
         //eventControl(HWC_DISPLAY_PRIMARY, SurfaceFlinger::EVENT_VSYNC, false);
+        // psw0523 debugging
+        ALOGD("disableHardwareVsync");
         mEventControlThread->setVsyncEnabled(false);
         mPrimaryDispSync.endResync();
         mPrimaryHWVsyncEnabled = false;
@@ -826,12 +841,17 @@ void SurfaceFlinger::onVSyncReceived(int type, nsecs_t timestamp) {
         if (type == 0 && mPrimaryHWVsyncEnabled) {
             needsHwVsync = mPrimaryDispSync.addResyncSample(timestamp);
         }
+        // psw0523 debugging
+        else {
+            ALOGE("onVSyncReceived: no call!!!");
+        }
     }
 
     if (needsHwVsync) {
         enableHardwareVsync();
     } else {
         // psw0523 fix
+        // psw0523 test for miware
 #ifndef PATCH_FOR_SLSIAP
         disableHardwareVsync(false);
 #endif
@@ -898,12 +918,16 @@ void SurfaceFlinger::handleMessageInvalidate() {
 
 void SurfaceFlinger::handleMessageRefresh() {
     ATRACE_CALL();
+    // psw0523 debugging
+    ALOGD("===>handleMessageRefersh");
     preComposition();
     rebuildLayerStacks();
     setUpHWComposer();
     doDebugFlashRegions();
     doComposition();
     postComposition();
+    // psw0523 debugging
+    ALOGD("<===");
 }
 
 void SurfaceFlinger::doDebugFlashRegions()
@@ -1153,7 +1177,9 @@ void SurfaceFlinger::postFramebuffer()
 
 #ifdef PATCH_FOR_SLSIAP
     if (hwc.hasGlesComposition(0)) {
-         hwc.wait_commit();
+        // psw0523 debugging
+        ALOGD("wait commit");
+        hwc.wait_commit();
     }
 #endif
 

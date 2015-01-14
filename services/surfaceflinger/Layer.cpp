@@ -154,6 +154,8 @@ void Layer::onLayerDisplayed(const sp<const DisplayDevice>& hw,
 
 void Layer::onFrameAvailable() {
     android_atomic_inc(&mQueuedFrames);
+    // psw0523 debugging
+    ALOGD("Layer onFrameAvail");
     mFlinger->signalLayerUpdate();
 }
 

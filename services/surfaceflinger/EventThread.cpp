@@ -89,6 +89,12 @@ void EventThread::requestNextVsync(
     Mutex::Autolock _l(mLock);
     if (connection->count < 0) {
         connection->count = 0;
+        // psw0523 debugging
+        //ALOGD("NV: wake up");
+        mCondition.broadcast();
+    }
+    // psw0523 test
+    else {
         mCondition.broadcast();
     }
 }
@@ -117,6 +123,8 @@ void EventThread::onVSyncEvent(nsecs_t timestamp) {
     mVSyncEvent[0].header.id = 0;
     mVSyncEvent[0].header.timestamp = timestamp;
     mVSyncEvent[0].vsync.count++;
+    // psw0523 debugging
+    //ALOGD("VS: wake up");
     mCondition.broadcast();
 }
 
@@ -143,6 +151,8 @@ bool EventThread::threadLoop() {
 
     // dispatch events to listeners...
     const size_t count = signalConnections.size();
+    // psw0523 debugging
+    //ALOGD("EventThread connection %d", count);
     for (size_t i=0 ; i<count ; i++) {
         const sp<Connection>& conn(signalConnections[i]);
         // now see if we still need to report this event
@@ -162,6 +172,8 @@ bool EventThread::threadLoop() {
             removeDisplayEventConnection(signalConnections[i]);
         }
     }
+    // psw0523 debugging
+    //ALOGD("End of threadLoop");
     return true;
 }
 
@@ -173,6 +185,8 @@ Vector< sp<EventThread::Connection> > EventThread::waitForEvent(
     Mutex::Autolock _l(mLock);
     Vector< sp<EventThread::Connection> > signalConnections;
 
+    // psw0523 debugging
+    //ALOGD("waitForEvent E");
     do {
         bool eventPending = false;
         bool waitForVSync = false;
@@ -200,6 +214,8 @@ Vector< sp<EventThread::Connection> > EventThread::waitForEvent(
             }
         }
 
+// psw0523 test
+CONNECTION_CHECK:
         // find out connections waiting for events
         size_t count = mDisplayEventConnections.size();
         for (size_t i=0 ; i<count ; i++) {
@@ -224,6 +240,9 @@ Vector< sp<EventThread::Connection> > EventThread::waitForEvent(
                             signalConnections.add(connection);
                             added = true;
                         }
+
+                        // psw0523 test
+                        //waitForVSync = false;
                     }
                 }
 
@@ -241,11 +260,41 @@ Vector< sp<EventThread::Connection> > EventThread::waitForEvent(
             }
         }
 
+        // psw0523 debugging
+        //ALOGD("eventPending %d, waitForVSync %d, vsyncCount %d",
+                //eventPending, waitForVSync, vsyncCount);
         // Here we figure out if we need to enable or disable vsyncs
         if (timestamp && !waitForVSync) {
             // we received a VSYNC but we have no clients
             // don't report it, and disable VSYNC events
+            // psw0523 test for miware
+#if 0
             disableVSyncLocked();
+#else
+            //mCondition.wait(mLock);
+            //continue;
+            //ALOGE("GOTO CONNECTION_CHECK");
+            //goto CONNECTION_CHECK;
+            //ALOGE("No Connection!");
+
+            //mVSyncEvent[0].header.type = DisplayEventReceiver::DISPLAY_EVENT_VSYNC;
+            //mVSyncEvent[0].header.id = DisplayDevice::DISPLAY_PRIMARY;
+            //mVSyncEvent[0].header.timestamp = timestamp;
+            //mVSyncEvent[0].vsync.count++;
+            //mVSyncEvent[0].header.timestamp = systemTime(SYSTEM_TIME_MONOTONIC);
+            //usleep(100000);
+            //
+            mCondition.wait(mLock);
+            sp<Connection> connection(mDisplayEventConnections[0].promote());
+            if (connection != NULL) {
+                if (connection->count == 0) {
+                    connection->count = -1;
+                    signalConnections.add(connection);
+                    ALOGD("force add");
+                    //waitForVSync = true;
+                }
+            }
+#endif
         } else if (!timestamp && waitForVSync) {
             // we have at least one client, so we want vsync enabled
             // (TODO: this function is called right after we finish
@@ -294,6 +343,8 @@ Vector< sp<EventThread::Connection> > EventThread::waitForEvent(
         }
     } while (signalConnections.isEmpty());
 
+    // psw0523 debugging
+    //ALOGD("waitForEvent X");
     // here we're guaranteed to have a timestamp and some connections to signal
     // (The connections might have dropped out of mDisplayEventConnections
     // while we were asleep, but we'll still have strong references to them.)

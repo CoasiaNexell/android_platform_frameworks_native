@@ -96,6 +96,8 @@ public:
                 Mutex::Autolock lock(mMutex);
 
                 if (mStop) {
+                    // psw0523 debugging
+                    ALOGE("DispSync thread Stopped!");
                     return false;
                 }
 
@@ -146,6 +148,10 @@ public:
 
             if (callbackInvocations.size() > 0) {
                 fireCallbackInvocations(callbackInvocations);
+            }
+            // psw0523 debugging
+            else {
+                 ALOGE("No callbackInvocations!");
             }
         }
 
@@ -236,6 +242,16 @@ private:
                     ref);
 
             if (t < now) {
+                CallbackInvocation ci;
+                ci.mCallback = mEventListeners[i].mCallback;
+                ci.mEventTime = t;
+                callbackInvocations.push(ci);
+                mEventListeners.editItemAt(i).mLastEventTime = t;
+            }
+            // psw0523 test
+            else {
+                ALOGE("t - now: %llu", t - now);
+                t = now - 100;
                 CallbackInvocation ci;
                 ci.mCallback = mEventListeners[i].mCallback;
                 ci.mEventTime = t;

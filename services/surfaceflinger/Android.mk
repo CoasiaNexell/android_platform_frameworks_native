@@ -94,6 +94,7 @@ ifeq ($(TARGET_BOARD_PLATFORM), slsiap)
 	#LOCAL_C_INCLUDES += hardware/samsung_slsi/pyrope/include system/core/include
 	#LOCAL_C_INCLUDES += hardware/samsung_slsi/pyrope/include
 	#LOCAL_C_FLAGS += -DDEBUG_LAYER
+	#LOCAL_CFLAGS += -DRUNNING_WITHOUT_SYNC_FRAMEWORK
 endif
 
 LOCAL_SHARED_LIBRARIES := \
