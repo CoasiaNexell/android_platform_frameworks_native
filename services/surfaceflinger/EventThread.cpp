@@ -245,7 +245,20 @@ Vector< sp<EventThread::Connection> > EventThread::waitForEvent(
         if (timestamp && !waitForVSync) {
             // we received a VSYNC but we have no clients
             // don't report it, and disable VSYNC events
+#ifndef MIWARE_PATCH
             disableVSyncLocked();
+#else
+			  mCondition.wait(mLock);
+            sp<Connection> connection(mDisplayEventConnections[0].promote());
+            if (connection != NULL) {
+                if (connection->count == 0) {
+                    connection->count = -1;
+                    signalConnections.add(connection);
+                    ALOGD("force add");
+                    //waitForVSync = true;
+                }
+             }
+#endif
         } else if (!timestamp && waitForVSync) {
             // we have at least one client, so we want vsync enabled
             // (TODO: this function is called right after we finish

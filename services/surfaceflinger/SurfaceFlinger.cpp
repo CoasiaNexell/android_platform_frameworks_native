@@ -898,12 +898,18 @@ void SurfaceFlinger::handleMessageInvalidate() {
 
 void SurfaceFlinger::handleMessageRefresh() {
     ATRACE_CALL();
+#ifdef DEBUG_RENDER_LATENCY
+    ALOGD("===>handleMessageRefresh");
+#endif
     preComposition();
     rebuildLayerStacks();
     setUpHWComposer();
     doDebugFlashRegions();
     doComposition();
     postComposition();
+#ifdef DEBUG_RENDER_LATENCY
+    ALOGD("<===");
+#endif
 }
 
 void SurfaceFlinger::doDebugFlashRegions()

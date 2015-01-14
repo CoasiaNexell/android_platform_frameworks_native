@@ -89,8 +89,12 @@ LOCAL_CFLAGS += -fvisibility=hidden
 # psw0523 add for pyrope
 ifeq ($(TARGET_BOARD_PLATFORM), pyrope)
 	LOCAL_CFLAGS += -DPATCH_FOR_PYROPE
-	#LOCAL_CFLAGS += -DPATCH_FOR_PYROPE -DDEBUG_LAYER
-	# for debugging
+	# for MIWARE
+	LOCAL_CFLAGS += -DMIWARE_PATCH
+	# if you want to debug render latency, turn on next
+	#LOCAL_CFLAGS += -DDEBUG_RENDER_LATENCY
+	
+	# if you want to debug layer, turn on next
 	#LOCAL_C_INCLUDES += hardware/nexell/pyrope/include system/core/include
 	#LOCAL_C_INCLUDES += hardware/nexell/pyrope/include
 	#LOCAL_C_FLAGS += -DDEBUG_LAYER

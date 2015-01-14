@@ -242,6 +242,16 @@ private:
                 callbackInvocations.push(ci);
                 mEventListeners.editItemAt(i).mLastEventTime = t;
             }
+#ifdef MIWARE_PATCH
+			else {
+				t = now - 100;
+             CallbackInvocation ci;
+             ci.mCallback = mEventListeners[i].mCallback;
+             ci.mEventTime = t;
+             callbackInvocations.push(ci);
+             mEventListeners.editItemAt(i).mLastEventTime = t;
+			}
+#endif
         }
 
         return callbackInvocations;
