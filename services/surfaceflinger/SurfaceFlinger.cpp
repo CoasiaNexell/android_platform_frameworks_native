@@ -919,7 +919,7 @@ void SurfaceFlinger::handleMessageInvalidate() {
 void SurfaceFlinger::handleMessageRefresh() {
     ATRACE_CALL();
     // psw0523 debugging
-    ALOGD("===>handleMessageRefersh");
+    //ALOGD("===>handleMessageRefersh");
     preComposition();
     rebuildLayerStacks();
     setUpHWComposer();
@@ -927,7 +927,7 @@ void SurfaceFlinger::handleMessageRefresh() {
     doComposition();
     postComposition();
     // psw0523 debugging
-    ALOGD("<===");
+    //ALOGD("<===");
 }
 
 void SurfaceFlinger::doDebugFlashRegions()

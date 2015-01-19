@@ -250,7 +250,7 @@ private:
             }
             // psw0523 test
             else {
-                ALOGE("t - now: %llu", t - now);
+                //ALOGE("t - now: %llu", t - now);
                 t = now - 100;
                 CallbackInvocation ci;
                 ci.mCallback = mEventListeners[i].mCallback;
