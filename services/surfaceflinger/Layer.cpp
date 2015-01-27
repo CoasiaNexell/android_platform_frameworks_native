@@ -155,7 +155,7 @@ void Layer::onLayerDisplayed(const sp<const DisplayDevice>& hw,
 void Layer::onFrameAvailable() {
     android_atomic_inc(&mQueuedFrames);
     // psw0523 debugging
-    ALOGD("Layer onFrameAvail");
+    //ALOGD("Layer onFrameAvail");
     mFlinger->signalLayerUpdate();
 }
 
@@ -835,6 +835,8 @@ bool Layer::setLayer(uint32_t z) {
     if (mCurrentState.z == z)
         return false;
     mCurrentState.sequence++;
+    // psw0523 debugging
+    ALOGD("layer %p ==> setLayer %d", this, z);
     mCurrentState.z = z;
     setTransactionFlags(eTransactionNeeded);
     return true;
@@ -1127,16 +1129,16 @@ Region Layer::latchBuffer(bool& recomputeVisibleRegions)
                 private_handle_t const *handle = reinterpret_cast<private_handle_t const *>(anwb->handle);
                 unsigned long phys;
                 ion_get_phys(ion_fd, handle->share_fd, &phys);
-                ALOGD("CURBUF: (%dx%d), phys: 0x%x, format: 0x%x",
-                        mActiveBuffer->getWidth(), mActiveBuffer->getHeight(), phys, handle->format);
+                ALOGD("%p ==> CURBUF: (%dx%d), phys: 0x%x, format: 0x%x",
+                        this, mActiveBuffer->getWidth(), mActiveBuffer->getHeight(), phys, handle->format);
 
-                if (oldActiveBuffer != NULL) {
-                    ANativeWindowBuffer *old_anwb = oldActiveBuffer->getNativeBuffer();
-                    private_handle_t const *old_handle = reinterpret_cast<private_handle_t const *>(old_anwb->handle);
-                    ion_get_phys(ion_fd, old_handle->share_fd, &phys);
-                    ALOGD("OLDBUF: (%dx%d), phys: 0x%x, format: 0x%x",
-                            oldActiveBuffer->getWidth(), oldActiveBuffer->getHeight(), phys, old_handle->format);
-                }
+                //if (oldActiveBuffer != NULL) {
+                    //ANativeWindowBuffer *old_anwb = oldActiveBuffer->getNativeBuffer();
+                    //private_handle_t const *old_handle = reinterpret_cast<private_handle_t const *>(old_anwb->handle);
+                    //ion_get_phys(ion_fd, old_handle->share_fd, &phys);
+                    //ALOGD("%p ==> OLDBUF: (%dx%d), phys: 0x%x, format: 0x%x",
+                            //this, oldActiveBuffer->getWidth(), oldActiveBuffer->getHeight(), phys, old_handle->format);
+                //}
             }
         }
 #endif

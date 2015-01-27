@@ -89,12 +89,11 @@ LOCAL_CFLAGS += -fvisibility=hidden
 # psw0523 add for slsiap
 ifeq ($(TARGET_BOARD_PLATFORM), slsiap)
 	LOCAL_CFLAGS += -DPATCH_FOR_SLSIAP
-	#LOCAL_CFLAGS += -DPATCH_FOR_SLSIAP -DDEBUG_LAYER
+
 	# for debugging
-	#LOCAL_C_INCLUDES += hardware/samsung_slsi/pyrope/include system/core/include
-	#LOCAL_C_INCLUDES += hardware/samsung_slsi/pyrope/include
-	#LOCAL_C_FLAGS += -DDEBUG_LAYER
-	#LOCAL_CFLAGS += -DRUNNING_WITHOUT_SYNC_FRAMEWORK
+	#LOCAL_CFLAGS += -DPATCH_FOR_SLSIAP -DDEBUG_LAYER
+	#LOCAL_C_INCLUDES += system/core/include
+	#LOCAL_C_INCLUDES += hardware/samsung_slsi/slsiap/include
 endif
 
 LOCAL_SHARED_LIBRARIES := \
@@ -110,7 +109,8 @@ LOCAL_SHARED_LIBRARIES := \
 	libui \
 	libgui
 
-#ifeq ($(TARGET_BOARD_PLATFORM), pyrope)
+# for debug layer
+#ifeq ($(TARGET_BOARD_PLATFORM), slsiap)
 	#LOCAL_SHARED_LIBRARIES += libion libion-nexell
 #endif
 

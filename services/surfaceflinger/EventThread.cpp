@@ -290,7 +290,7 @@ CONNECTION_CHECK:
                 if (connection->count == 0) {
                     connection->count = -1;
                     signalConnections.add(connection);
-                    ALOGD("force add");
+                    //ALOGD("force add");
                     //waitForVSync = true;
                 }
             }

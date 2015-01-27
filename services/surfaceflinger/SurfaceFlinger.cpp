@@ -919,7 +919,7 @@ void SurfaceFlinger::handleMessageInvalidate() {
 void SurfaceFlinger::handleMessageRefresh() {
     ATRACE_CALL();
     // psw0523 debugging
-    //ALOGD("===>handleMessageRefersh");
+    //ALOGD("===>handleMessageRefresh");
     preComposition();
     rebuildLayerStacks();
     setUpHWComposer();
@@ -1049,6 +1049,13 @@ void SurfaceFlinger::rebuildLayerStacks() {
                 for (size_t i=0 ; i<count ; i++) {
                     const sp<Layer>& layer(layers[i]);
                     const Layer::State& s(layer->getDrawingState());
+                    // psw0523 test for miware
+                    //if (!strcmp(layer->getName().string(),"KODI VID Surface")) {
+                        //layersSortedByZ.add(layer);
+                        //ALOGD("KODI VID Surface Added");
+                    //}
+                    //else
+                    // end psw0523
                     if (s.layerStack == hw->getLayerStack()) {
                         Region drawRegion(tr.transform(
                                 layer->visibleNonTransparentRegion));
@@ -1178,7 +1185,7 @@ void SurfaceFlinger::postFramebuffer()
 #ifdef PATCH_FOR_SLSIAP
     if (hwc.hasGlesComposition(0)) {
         // psw0523 debugging
-        ALOGD("wait commit");
+        //ALOGD("wait commit");
         hwc.wait_commit();
     }
 #endif
