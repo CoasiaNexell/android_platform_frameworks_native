@@ -1050,11 +1050,11 @@ void SurfaceFlinger::rebuildLayerStacks() {
                     const sp<Layer>& layer(layers[i]);
                     const Layer::State& s(layer->getDrawingState());
                     // psw0523 test for miware
-                    //if (!strcmp(layer->getName().string(),"KODI VID Surface")) {
-                        //layersSortedByZ.add(layer);
-                        //ALOGD("KODI VID Surface Added");
-                    //}
-                    //else
+                    if (!strcmp(layer->getName().string(),"KODI VID Surface")) {
+                        layersSortedByZ.add(layer);
+                        ALOGD("KODI VID Surface Added");
+                    }
+                    else
                     // end psw0523
                     if (s.layerStack == hw->getLayerStack()) {
                         Region drawRegion(tr.transform(
