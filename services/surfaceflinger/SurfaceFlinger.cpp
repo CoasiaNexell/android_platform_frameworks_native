@@ -299,7 +299,10 @@ void SurfaceFlinger::bootFinished()
     // stop boot animation
     // formerly we would just kill the process, but we now ask it to exit so it
     // can choose where to stop the animation.
-    property_set("service.bootanim.exit", "1");
+    // psw0523 fix for fine
+    //property_set("service.bootanim.exit", "1");
+    property_set("ctl.start", "defer");
+    //property_set("ctl.start", "adbd");
 }
 
 void SurfaceFlinger::deleteTextureAsync(uint32_t texture) {
@@ -624,7 +627,8 @@ void SurfaceFlinger::init() {
     initializeDisplays();
 
     // start boot animation
-    startBootAnim();
+    // psw0523 fix for fine
+    //startBootAnim();
 }
 
 int32_t SurfaceFlinger::allocateHwcDisplayId(DisplayDevice::DisplayType type) {
