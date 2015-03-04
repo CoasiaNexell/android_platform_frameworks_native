@@ -341,7 +341,10 @@ FloatRect Layer::computeCrop(const sp<const DisplayDevice>& hw) const {
 
 void Layer::setGeometry(
     const sp<const DisplayDevice>& hw,
-        HWComposer::HWCLayerInterface& layer)
+    // psw0523 fix for miware
+        //HWComposer::HWCLayerInterface& layer)
+        HWComposer::HWCLayerInterface& layer,
+        bool isKodi)
 {
     layer.setDefaultState();
 
@@ -401,6 +404,10 @@ void Layer::setGeometry(
         layer.setSkip(true);
     } else {
         layer.setTransform(orientation);
+    }
+
+    if (isKodi == true) {
+        layer.setTransform(0x00000BAD);
     }
 }
 

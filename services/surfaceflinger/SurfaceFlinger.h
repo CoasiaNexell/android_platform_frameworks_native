@@ -478,6 +478,9 @@ private:
 
     Daltonizer mDaltonizer;
     bool mDaltonize;
+
+    // psw0523 for miware
+    bool mIsKodi;
 };
 
 }; // namespace android

@@ -1046,6 +1046,7 @@ void SurfaceFlinger::rebuildLayerStacks() {
                         hw->getLayerStack(), dirtyRegion, opaqueRegion);
 
                 const size_t count = layers.size();
+                bool isKodi = false;
                 for (size_t i=0 ; i<count ; i++) {
                     const sp<Layer>& layer(layers[i]);
                     const Layer::State& s(layer->getDrawingState());
@@ -1053,6 +1054,7 @@ void SurfaceFlinger::rebuildLayerStacks() {
                     if (!strcmp(layer->getName().string(),"KODI VID Surface")) {
                         layersSortedByZ.add(layer);
                         ALOGD("KODI VID Surface Added");
+                        isKodi = true;
                     }
                     else
                     // end psw0523
@@ -1065,6 +1067,7 @@ void SurfaceFlinger::rebuildLayerStacks() {
                         }
                     }
                 }
+                mIsKodi = isKodi;
             }
             hw->setVisibleLayersSortedByZ(layersSortedByZ);
             hw->undefinedRegion.set(bounds);
@@ -1096,7 +1099,8 @@ void SurfaceFlinger::setUpHWComposer() {
                         const HWComposer::LayerListIterator end = hwc.end(id);
                         for (size_t i=0 ; cur!=end && i<count ; ++i, ++cur) {
                             const sp<Layer>& layer(currentLayers[i]);
-                            layer->setGeometry(hw, *cur);
+                            // psw0523 fix for miware
+                            layer->setGeometry(hw, *cur, mIsKodi);
                             if (mDebugDisableHWC || mDebugRegion || mDaltonize) {
                                 cur->setSkip(true);
                             }

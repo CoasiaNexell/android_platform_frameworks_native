@@ -184,7 +184,7 @@ public:
     // -----------------------------------------------------------------------
 
     void setGeometry(const sp<const DisplayDevice>& hw,
-            HWComposer::HWCLayerInterface& layer);
+            HWComposer::HWCLayerInterface& layer, bool isKodi = false);
     void setPerFrameData(const sp<const DisplayDevice>& hw,
             HWComposer::HWCLayerInterface& layer);
     void setAcquireFence(const sp<const DisplayDevice>& hw,
