@@ -299,6 +299,7 @@ void SurfaceFlinger::bootFinished()
     // psw0523 add for adjust lowmem
 #ifdef PATCH_FOR_PYROPE
     property_set("ctl.start", "adjlowmem");
+    property_set("ctl.start", "defer");
 #endif
 }
 
