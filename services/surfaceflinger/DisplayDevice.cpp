@@ -235,15 +235,9 @@ void DisplayDevice::swapBuffers(HWComposer& hwc) const {
     //    (a) we have framebuffer target support (not present on legacy
     //        devices, where HWComposer::commit() handles things); or
     //    (b) this is a virtual display
-#ifdef PATCH_FOR_PYROPE
-    if ((hwc.initCheck() != NO_ERROR) ||
-        ((hwc.hasGlesComposition(mHwcDisplayId) || hwc.getForceSwapBuffers(mType)) &&
-         (hwc.supportsFramebufferTarget() || mType >= DISPLAY_VIRTUAL))) {
-#else
     if (hwc.initCheck() != NO_ERROR ||
             (hwc.hasGlesComposition(mHwcDisplayId) &&
              (hwc.supportsFramebufferTarget() || mType >= DISPLAY_VIRTUAL))) {
-#endif
         EGLBoolean success = eglSwapBuffers(mDisplay, mSurface);
         if (!success) {
             EGLint error = eglGetError();
@@ -483,12 +477,8 @@ void DisplayDevice::setProjection(int orientation,
     mGlobalTransform = R * TP * S * TL;
 
     const uint8_t type = mGlobalTransform.getType();
-#ifdef PATCH_FOR_PYROPE
-    mNeedsFiltering = true;
-#else
     mNeedsFiltering = (!mGlobalTransform.preserveRects() ||
             (type >= Transform::SCALE));
-#endif
 
     mScissor = mGlobalTransform.transform(viewport);
     if (mScissor.isEmpty()) {

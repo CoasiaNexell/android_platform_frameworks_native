@@ -83,18 +83,14 @@ else
     LOCAL_CFLAGS += -DPRESENT_TIME_OFFSET_FROM_VSYNC_NS=0
 endif
 
+ifneq ($(MAX_VIRTUAL_DISPLAY_DIMENSION),)
+    LOCAL_CFLAGS += -DMAX_VIRTUAL_DISPLAY_DIMENSION=$(MAX_VIRTUAL_DISPLAY_DIMENSION)
+else
+    LOCAL_CFLAGS += -DMAX_VIRTUAL_DISPLAY_DIMENSION=0
+endif
+
 LOCAL_CFLAGS += -fvisibility=hidden -Werror=format
 LOCAL_CFLAGS += -std=c++11
-
-# psw0523 add for slsiap
-ifeq ($(TARGET_BOARD_PLATFORM), slsiap)
-	LOCAL_CFLAGS += -DPATCH_FOR_PYROPE
-	#LOCAL_CFLAGS += -DPATCH_FOR_PYROPE -DDEBUG_LAYER
-	# for debugging
-	#LOCAL_C_INCLUDES += system/core/include
-	#LOCAL_C_INCLUDES += hardware/samsung_slsi/slsiap/include
-	#LOCAL_C_FLAGS += -DDEBUG_LAYER
-endif
 
 LOCAL_SHARED_LIBRARIES := \
 	libcutils \
@@ -118,17 +114,22 @@ include $(BUILD_SHARED_LIBRARY)
 # build surfaceflinger's executable
 include $(CLEAR_VARS)
 
+LOCAL_LDFLAGS := -Wl,--version-script,art/sigchainlib/version-script.txt -Wl,--export-dynamic
 LOCAL_CFLAGS:= -DLOG_TAG=\"SurfaceFlinger\"
+LOCAL_CPPFLAGS:= -std=c++11
 
 LOCAL_SRC_FILES:= \
-	main_surfaceflinger.cpp 
+	main_surfaceflinger.cpp
 
 LOCAL_SHARED_LIBRARIES := \
 	libsurfaceflinger \
 	libcutils \
 	liblog \
 	libbinder \
-	libutils
+	libutils \
+	libdl
+
+LOCAL_WHOLE_STATIC_LIBRARIES := libsigchain
 
 LOCAL_MODULE:= surfaceflinger
 
