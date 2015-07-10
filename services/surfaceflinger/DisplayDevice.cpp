@@ -236,7 +236,11 @@ void DisplayDevice::swapBuffers(HWComposer& hwc) const {
     //        devices, where HWComposer::commit() handles things); or
     //    (b) this is a virtual display
     if (hwc.initCheck() != NO_ERROR ||
-            (hwc.hasGlesComposition(mHwcDisplayId) &&
+#ifdef PATCH_FOR_SLSIAP
+        ((hwc.hasGlesComposition(mHwcDisplayId) || hwc.getForceSwapBuffers(mType)) &&
+#else
+        (hwc.hasGlesComposition(mHwcDisplayId) &&
+#endif
              (hwc.supportsFramebufferTarget() || mType >= DISPLAY_VIRTUAL))) {
         EGLBoolean success = eglSwapBuffers(mDisplay, mSurface);
         if (!success) {
@@ -477,8 +481,12 @@ void DisplayDevice::setProjection(int orientation,
     mGlobalTransform = R * TP * S * TL;
 
     const uint8_t type = mGlobalTransform.getType();
+#ifdef PATCH_FOR_SLSIAP
+    mNeedsFiltering = true;
+#else
     mNeedsFiltering = (!mGlobalTransform.preserveRects() ||
             (type >= Transform::SCALE));
+#endif
 
     mScissor = mGlobalTransform.transform(viewport);
     if (mScissor.isEmpty()) {

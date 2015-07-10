@@ -131,9 +131,16 @@ status_t BufferQueueProducer::setBufferCount(int bufferCount) {
     return NO_ERROR;
 }
 
+#ifdef PATCH_FOR_SLSIAP
+static uint32_t sLastFBFreeIndex = -1;
+#endif
+
 status_t BufferQueueProducer::waitForFreeSlotThenRelock(const char* caller,
         bool async, int* found, status_t* returnFlags) const {
     bool tryAgain = true;
+#ifdef PATCH_FOR_SLSIAP
+    uint32_t usage = mCore->mConsumerUsageBits;
+#endif
     while (tryAgain) {
         if (mCore->mIsAbandoned) {
             BQ_LOGE("%s: BufferQueue has been abandoned", caller);
@@ -177,10 +184,25 @@ status_t BufferQueueProducer::waitForFreeSlotThenRelock(const char* caller,
                     // We return the oldest of the free buffers to avoid
                     // stalling the producer if possible, since the consumer
                     // may still have pending reads of in-flight buffers
+#ifdef PATCH_FOR_SLSIAP
+                    if (usage & GRALLOC_USAGE_HW_FB) {
+                        if (*found == BufferQueueCore::INVALID_BUFFER_SLOT) {
+                            int nextIndex = (sLastFBFreeIndex + 1) % maxBufferCount;
+                            *found = nextIndex;
+                            sLastFBFreeIndex = nextIndex;
+                        }
+                    } else {
+                        if (*found == BufferQueueCore::INVALID_BUFFER_SLOT ||
+                                mSlots[s].mFrameNumber < mSlots[*found].mFrameNumber) {
+                            *found = s;
+                        }
+                    }
+#else
                     if (*found == BufferQueueCore::INVALID_BUFFER_SLOT ||
                             mSlots[s].mFrameNumber < mSlots[*found].mFrameNumber) {
                         *found = s;
                     }
+#endif
                     break;
                 default:
                     break;

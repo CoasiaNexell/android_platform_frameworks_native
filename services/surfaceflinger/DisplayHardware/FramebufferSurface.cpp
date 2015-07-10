@@ -58,11 +58,29 @@ FramebufferSurface::FramebufferSurface(HWComposer& hwc, int disp,
     mCurrentBuffer(0),
     mHwc(hwc)
 {
+#ifdef PATCH_FOR_SLSIAP
+    if (mDisplayType == HWC_DISPLAY_PRIMARY)
+        mName = "FramebufferSurface0";
+    else
+        mName = "FramebufferSurface1";
+#else
     mName = "FramebufferSurface";
+#endif
     mConsumer->setConsumerName(mName);
+#ifdef PATCH_FOR_SLSIAP
+    if (mDisplayType == HWC_DISPLAY_PRIMARY) {
+        mConsumer->setConsumerUsageBits(GRALLOC_USAGE_HW_FB |
+                GRALLOC_USAGE_HW_RENDER |
+                GRALLOC_USAGE_HW_COMPOSER);
+    } else {
+        mConsumer->setConsumerUsageBits(GRALLOC_USAGE_HW_RENDER |
+                GRALLOC_USAGE_HW_COMPOSER);
+    }
+#else
     mConsumer->setConsumerUsageBits(GRALLOC_USAGE_HW_FB |
                                        GRALLOC_USAGE_HW_RENDER |
                                        GRALLOC_USAGE_HW_COMPOSER);
+#endif
     mConsumer->setDefaultBufferFormat(mHwc.getFormat(disp));
     mConsumer->setDefaultBufferSize(mHwc.getWidth(disp),  mHwc.getHeight(disp));
     mConsumer->setDefaultMaxBufferCount(NUM_FRAMEBUFFER_SURFACE_BUFFERS);
