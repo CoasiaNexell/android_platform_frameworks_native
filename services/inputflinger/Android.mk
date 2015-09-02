@@ -45,6 +45,11 @@ LOCAL_CFLAGS += -Wno-unused-parameter
 
 LOCAL_EXPORT_C_INCLUDE_DIRS := $(LOCAL_PATH)
 
+ifeq ($(BOARD_USES_TSLIB),true)
+    LOCAL_CFLAGS += -DHAVE_TSLIB
+    LOCAL_SHARED_LIBRARIES += libts
+    LOCAL_C_INCLUDES += external/tslib/src
+endif
 LOCAL_MODULE := libinputflinger
 
 include $(BUILD_SHARED_LIBRARY)
