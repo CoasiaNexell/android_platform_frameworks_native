@@ -296,6 +296,11 @@ void SurfaceFlinger::bootFinished()
     // formerly we would just kill the process, but we now ask it to exit so it
     // can choose where to stop the animation.
     property_set("service.bootanim.exit", "1");
+    // psw0523 add for adjust lowmem
+#ifdef PATCH_FOR_PYROPE
+    property_set("ctl.start", "adjlowmem");
+    property_set("ctl.start", "defer");
+#endif
 }
 
 void SurfaceFlinger::deleteTextureAsync(uint32_t texture) {
