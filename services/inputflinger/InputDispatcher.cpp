@@ -20,28 +20,28 @@
 //#define LOG_NDEBUG 0
 
 // Log detailed debug messages about each inbound event notification to the dispatcher.
-#define DEBUG_INBOUND_EVENT_DETAILS 1
+#define DEBUG_INBOUND_EVENT_DETAILS 0
 
 // Log detailed debug messages about each outbound event processed by the dispatcher.
-#define DEBUG_OUTBOUND_EVENT_DETAILS 1
+#define DEBUG_OUTBOUND_EVENT_DETAILS 0
 
 // Log debug messages about the dispatch cycle.
-#define DEBUG_DISPATCH_CYCLE 1
+#define DEBUG_DISPATCH_CYCLE 0
 
 // Log debug messages about registrations.
-#define DEBUG_REGISTRATION 1
+#define DEBUG_REGISTRATION 0
 
 // Log debug messages about input event injection.
-#define DEBUG_INJECTION 1
+#define DEBUG_INJECTION 0
 
 // Log debug messages about input focus tracking.
-#define DEBUG_FOCUS 1
+#define DEBUG_FOCUS 0
 
 // Log debug messages about the app switch latency optimization.
-#define DEBUG_APP_SWITCH 1
+#define DEBUG_APP_SWITCH 0
 
 // Log debug messages about hover events.
-#define DEBUG_HOVER 1
+#define DEBUG_HOVER 0
 
 #include "InputDispatcher.h"
 
@@ -1224,9 +1224,9 @@ int32_t InputDispatcher::findTouchedWindowTargetsLocked(nsecs_t currentTime,
                     isTouchModal = (flags & (InputWindowInfo::FLAG_NOT_FOCUSABLE
                             | InputWindowInfo::FLAG_NOT_TOUCH_MODAL)) == 0;
                     // MULTIWINDOW DEBUGGING
-                    ALOGD("(%d,%d) ===> window name: %s --> containsPoint", x, y, windowHandle->getName().string(),
-                            windowInfo->touchableRegionContainsPoint(x,y));
-                    printRegion(windowInfo->touchableRegion);
+                    //ALOGD("(%d,%d) ===> window name: %s --> containsPoint", x, y, windowHandle->getName().string(),
+                            //windowInfo->touchableRegionContainsPoint(x,y));
+                    //printRegion(windowInfo->touchableRegion);
                     if (isTouchModal || windowInfo->touchableRegionContainsPoint(x, y)) {
                         newTouchedWindowHandle = windowHandle;
                         break; // found touched window, exit window loop
