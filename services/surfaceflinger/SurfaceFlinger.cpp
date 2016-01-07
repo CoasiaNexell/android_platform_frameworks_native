@@ -1245,8 +1245,6 @@ void SurfaceFlinger::handleTransactionLocked(uint32_t transactionFlags)
     const LayerVector& currentLayers(mCurrentState.layersSortedByZ);
     const size_t count = currentLayers.size();
 
-    ALOGD("handleTransactionLocked E: transactionFlags 0x%x", transactionFlags);
-
     /*
      * Traversal of the children
      * (perform the transaction for each of them if needed)
@@ -1263,7 +1261,6 @@ void SurfaceFlinger::handleTransactionLocked(uint32_t transactionFlags)
                 mVisibleRegionsDirty = true;
         }
     }
-    ALOGD("LINE %d", __LINE__);
 
     /*
      * Perform display own transactions if needed
@@ -1423,7 +1420,6 @@ void SurfaceFlinger::handleTransactionLocked(uint32_t transactionFlags)
             }
         }
     }
-    ALOGD("LINE %d", __LINE__);
 
     if (transactionFlags & (eTraversalNeeded|eDisplayTransactionNeeded)) {
         // The transform hint might have changed for some layers
@@ -1483,7 +1479,6 @@ void SurfaceFlinger::handleTransactionLocked(uint32_t transactionFlags)
             layer->updateTransformHint(disp);
         }
     }
-    ALOGD("LINE %d", __LINE__);
 
 
     /*
@@ -1516,13 +1511,10 @@ void SurfaceFlinger::handleTransactionLocked(uint32_t transactionFlags)
             }
         }
     }
-    ALOGD("LINE %d", __LINE__);
 
     commitTransaction();
-    ALOGD("LINE %d", __LINE__);
 
     updateCursorAsync();
-    ALOGD("LINE %d", __LINE__);
 }
 
 void SurfaceFlinger::updateCursorAsync()
