@@ -74,7 +74,8 @@ FramebufferSurface::FramebufferSurface(HWComposer& hwc, int disp,
                 GRALLOC_USAGE_HW_COMPOSER);
     } else {
         mConsumer->setConsumerUsageBits(GRALLOC_USAGE_HW_RENDER |
-                GRALLOC_USAGE_HW_COMPOSER);
+                GRALLOC_USAGE_HW_COMPOSER |
+                GRALLOC_USAGE_EXTERNAL_DISP);
     }
 #else
     mConsumer->setConsumerUsageBits(GRALLOC_USAGE_HW_FB |

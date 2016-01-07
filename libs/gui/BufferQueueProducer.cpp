@@ -76,6 +76,15 @@ status_t BufferQueueProducer::setBufferCount(int bufferCount) {
     ATRACE_CALL();
     BQ_LOGV("setBufferCount: count = %d", bufferCount);
 
+    // patch for issue 1554 : external display buffer count must be same to framebuffer count
+#ifdef PATCH_FOR_SLSIAP
+    if (mConsumerName == "FramebufferSurface1") {
+        BQ_LOGE("Why set buffer count for FrameBufferSurface!!! --> %d", bufferCount);
+        mCore->mOverrideMaxBufferCount = 3;
+        return BAD_VALUE;
+    }
+#endif
+
     sp<IConsumerListener> listener;
     { // Autolock scope
         Mutex::Autolock lock(mCore->mMutex);
@@ -132,7 +141,8 @@ status_t BufferQueueProducer::setBufferCount(int bufferCount) {
 }
 
 #ifdef PATCH_FOR_SLSIAP
-static uint32_t sLastFBFreeIndex = -1;
+static int32_t sLastFBFreeIndex = -1;
+static int32_t sLastExtDispFreeIndex = -1;
 #endif
 
 status_t BufferQueueProducer::waitForFreeSlotThenRelock(const char* caller,
@@ -185,11 +195,20 @@ status_t BufferQueueProducer::waitForFreeSlotThenRelock(const char* caller,
                     // stalling the producer if possible, since the consumer
                     // may still have pending reads of in-flight buffers
 #ifdef PATCH_FOR_SLSIAP
-                    if (usage & GRALLOC_USAGE_HW_FB) {
+                    
+                    if (usage & GRALLOC_USAGE_EXTERNAL_DISP) {
+                        if (*found == BufferQueueCore::INVALID_BUFFER_SLOT) {
+                            int nextIndex = (sLastExtDispFreeIndex + 1) % maxBufferCount;
+                            *found = nextIndex;
+                            sLastExtDispFreeIndex = nextIndex;
+                            // BQ_LOGE("found %d", *found);
+                        }
+                    } else if (usage & GRALLOC_USAGE_HW_FB) {
                         if (*found == BufferQueueCore::INVALID_BUFFER_SLOT) {
                             int nextIndex = (sLastFBFreeIndex + 1) % maxBufferCount;
                             *found = nextIndex;
                             sLastFBFreeIndex = nextIndex;
+                            // BQ_LOGE("found %d", *found);
                         }
                     } else {
                         if (*found == BufferQueueCore::INVALID_BUFFER_SLOT ||

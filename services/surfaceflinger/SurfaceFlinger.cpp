@@ -1129,7 +1129,12 @@ void SurfaceFlinger::setUpHWComposer() {
 void SurfaceFlinger::doComposition() {
     ATRACE_CALL();
     const bool repaintEverything = android_atomic_and(0, &mRepaintEverything);
+    // patch for issue 1554 : lcd contents -- hdmi contents sync problem
+#ifdef PATCH_FOR_SLSIAP
+    for (int dpy=(mDisplays.size() - 1) ; dpy >= 0 ; dpy--) {
+#else
     for (size_t dpy=0 ; dpy<mDisplays.size() ; dpy++) {
+#endif
         const sp<DisplayDevice>& hw(mDisplays[dpy]);
         if (hw->isDisplayOn()) {
             // transform the dirty region into this screen's coordinate space
