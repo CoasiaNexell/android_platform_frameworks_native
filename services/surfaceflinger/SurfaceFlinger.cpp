@@ -831,11 +831,7 @@ void SurfaceFlinger::onVSyncReceived(int type, nsecs_t timestamp) {
     if (needsHwVsync) {
         enableHardwareVsync();
     } else {
-        // psw0523 fix
-#ifndef PATCH_FOR_SLSIAP
         disableHardwareVsync(false);
-#endif
-        // end psw0523
     }
 }
 
@@ -1143,19 +1139,8 @@ void SurfaceFlinger::postFramebuffer()
             //    for the current rendering API."
             getDefaultDisplayDevice()->makeCurrent(mEGLDisplay, mEGLContext);
         }
-#ifdef PATCH_FOR_SLSIAP
-        if (!hwc.hasGlesComposition(0))
-            hwc.commit();
-#else
         hwc.commit();
-#endif
     }
-
-#ifdef PATCH_FOR_SLSIAP
-    if (hwc.hasGlesComposition(0)) {
-         hwc.wait_commit();
-    }
-#endif
 
     // make the default display current because the VirtualDisplayDevice code cannot
     // deal with dequeueBuffer() being called outside of the composition loop; however
@@ -1723,12 +1708,6 @@ void SurfaceFlinger::doComposeSurfaces(const sp<const DisplayDevice>& hw, const 
 
     bool hasGlesComposition = hwc.hasGlesComposition(id);
     if (hasGlesComposition) {
-        // psw0523 add
-#ifdef PATCH_FOR_SLSIAP
-        hwc.setBeforeGlesComposite(id, true);
-        hwc.setForceSwapBuffers(id, false);
-#endif
-        // end psw0523
         if (!hw->makeCurrent(mEGLDisplay, mEGLContext)) {
             ALOGW("DisplayDevice::makeCurrent failed. Aborting surface composition for display %s",
                   hw->getDisplayName().string());
@@ -1784,22 +1763,6 @@ void SurfaceFlinger::doComposeSurfaces(const sp<const DisplayDevice>& hw, const 
             }
         }
     }
-    // psw0523 add
-#ifdef PATCH_FOR_SLSIAP
-    else {
-        if (hwc.hasHwcComposition(id) && hwc.getBeforeGlesComposite(id)) {
-            ALOGD("psw0523===> clear FB by GL : id %d!!!", id);
-            hw->makeCurrent(mEGLDisplay, mEGLContext);
-            RenderEngine& engine(getRenderEngine());
-            engine.clearWithColor(0, 0, 0, 0);
-            hwc.setForceSwapBuffers(id, true);
-        } else {
-            hwc.setForceSwapBuffers(id, false);
-        }
-        hwc.setBeforeGlesComposite(id, false);
-    }
-#endif
-    // end psw0523
 
     /*
      * and then, render the layers targeted at the framebuffer
@@ -2309,8 +2272,6 @@ void SurfaceFlinger::unblank(const sp<IBinder>& display) {
 }
 
 void SurfaceFlinger::blank(const sp<IBinder>& display) {
-    // psw0523 fix
-#ifndef PATCH_FOR_SLSIAP
     class MessageScreenReleased : public MessageBase {
         SurfaceFlinger& mFlinger;
         sp<IBinder> mDisplay;
@@ -2331,7 +2292,6 @@ void SurfaceFlinger::blank(const sp<IBinder>& display) {
     };
     sp<MessageBase> msg = new MessageScreenReleased(*this, display);
     postMessageSync(msg);
-#endif
 }
 
 // ---------------------------------------------------------------------------

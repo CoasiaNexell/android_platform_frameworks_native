@@ -83,18 +83,7 @@ else
     LOCAL_CFLAGS += -DPRESENT_TIME_OFFSET_FROM_VSYNC_NS=0
 endif
 
-
 LOCAL_CFLAGS += -fvisibility=hidden
-
-# psw0523 add for slsiap
-ifeq ($(TARGET_BOARD_PLATFORM), slsiap)
-	LOCAL_CFLAGS += -DPATCH_FOR_SLSIAP
-	#LOCAL_CFLAGS += -DPATCH_FOR_SLSIAP -DDEBUG_LAYER
-	# for debugging
-	#LOCAL_C_INCLUDES += hardware/samsung_slsi/pyrope/include system/core/include
-	#LOCAL_C_INCLUDES += hardware/samsung_slsi/pyrope/include
-	#LOCAL_C_FLAGS += -DDEBUG_LAYER
-endif
 
 LOCAL_SHARED_LIBRARIES := \
 	libcutils \
@@ -108,10 +97,6 @@ LOCAL_SHARED_LIBRARIES := \
 	libbinder \
 	libui \
 	libgui
-
-#ifeq ($(TARGET_BOARD_PLATFORM), pyrope)
-	#LOCAL_SHARED_LIBRARIES += libion libion-nexell
-#endif
 
 LOCAL_MODULE:= libsurfaceflinger
 
