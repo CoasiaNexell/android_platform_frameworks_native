@@ -31,11 +31,14 @@ namespace android {
 // ---------------------------------------------------------------------------
 
 BatteryService::BatteryService() {
+	//MCJINO BLOCK 
+	/*
     const sp<IServiceManager> sm(defaultServiceManager());
     if (sm != NULL) {
         const String16 name("batterystats");
         mBatteryStatService = sm->getService(name);
     }
+	*/
 }
 
 status_t BatteryService::noteStartSensor(int uid, int handle) {

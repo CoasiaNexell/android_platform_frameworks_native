@@ -299,7 +299,8 @@ void SurfaceFlinger::bootFinished()
     // stop boot animation
     // formerly we would just kill the process, but we now ask it to exit so it
     // can choose where to stop the animation.
-    property_set("service.bootanim.exit", "1");
+    //property_set("service.bootanim.exit", "1");
+	property_set("ctrl.start", "defer");
 }
 
 void SurfaceFlinger::deleteTextureAsync(uint32_t texture) {
