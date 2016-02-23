@@ -2096,9 +2096,10 @@ void SurfaceFlinger::setTransactionState(
     }
 
     // patch for show touches delay issue : issue 1565
-#ifdef PATCH_FOR_SLSIAP
-    mEventQueue.invalidateTransactionNow();
-#endif
+    // revert this patch because of side effect(2016.02.23)
+// #ifdef PATCH_FOR_SLSIAP
+//     mEventQueue.invalidateTransactionNow();
+// #endif
 }
 
 uint32_t SurfaceFlinger::setDisplayStateLocked(const DisplayState& s)
