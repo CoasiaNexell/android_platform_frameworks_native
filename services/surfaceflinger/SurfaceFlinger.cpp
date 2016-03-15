@@ -301,6 +301,7 @@ void SurfaceFlinger::bootFinished()
     property_set("ctl.start", "adjlowmem");
     property_set("ctl.start", "defer");
 #endif
+	property_set("persist.calibration.state", "done");
 }
 
 void SurfaceFlinger::deleteTextureAsync(uint32_t texture) {
