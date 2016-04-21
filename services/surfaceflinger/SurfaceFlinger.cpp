@@ -1106,7 +1106,11 @@ void SurfaceFlinger::setUpHWComposer() {
 void SurfaceFlinger::doComposition() {
     ATRACE_CALL();
     const bool repaintEverything = android_atomic_and(0, &mRepaintEverything);
+#ifdef PATCH_FOR_SLSIAP
+    for (int dpy=(mDisplays.size() - 1) ; dpy >= 0 ; dpy--) {
+#else
     for (size_t dpy=0 ; dpy<mDisplays.size() ; dpy++) {
+#endif
         const sp<DisplayDevice>& hw(mDisplays[dpy]);
         if (hw->canDraw()) {
             // transform the dirty region into this screen's coordinate space
@@ -1140,8 +1144,18 @@ void SurfaceFlinger::postFramebuffer()
             //    for the current rendering API."
             getDefaultDisplayDevice()->makeCurrent(mEGLDisplay, mEGLContext);
         }
+#ifdef PATCH_FOR_SLSIAP
+        if (!hwc.hasGlesComposition(0))
+            hwc.commit();
+#else
         hwc.commit();
+#endif
     }
+
+#ifdef PATCH_FOR_SLSIAP
+    if (hwc.hasGlesComposition(0))
+        hwc.wait_commit();
+#endif
 
     // make the default display current because the VirtualDisplayDevice code cannot
     // deal with dequeueBuffer() being called outside of the composition loop; however
@@ -1709,6 +1723,12 @@ void SurfaceFlinger::doComposeSurfaces(const sp<const DisplayDevice>& hw, const 
 
     bool hasGlesComposition = hwc.hasGlesComposition(id);
     if (hasGlesComposition) {
+
+#ifdef PATCH_FOR_SLSIAP
+        hwc.setBeforeGlesComposite(id, true);
+        hwc.setForceSwapBuffers(id, false);
+#endif
+
         if (!hw->makeCurrent(mEGLDisplay, mEGLContext)) {
             ALOGW("DisplayDevice::makeCurrent failed. Aborting surface composition for display %s",
                   hw->getDisplayName().string());
@@ -1764,6 +1784,21 @@ void SurfaceFlinger::doComposeSurfaces(const sp<const DisplayDevice>& hw, const 
             }
         }
     }
+#ifdef PATCH_FOR_SLSIAP
+    else {
+        if (hwc.hasHwcComposition(id) && hwc.getBeforeGlesComposite(id)) {
+            ALOGD("SLSIAP ==> clear FB by GL : id %d!!!", id);
+            hw->makeCurrent(mEGLDisplay, mEGLContext);
+            RenderEngine& engine(getRenderEngine());
+            engine.clearWithColor(0, 0, 0, 0);
+            hwc.setForceSwapBuffers(id, true);
+        } else {
+            hwc.setForceSwapBuffers(id, false);
+        }
+        hwc.setBeforeGlesComposite(id, false);
+    }
+#endif
+
 
     /*
      * and then, render the layers targeted at the framebuffer
