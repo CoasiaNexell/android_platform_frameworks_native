@@ -62,6 +62,9 @@ Layer::Layer(SurfaceFlinger* flinger, const sp<Client>& client,
         mTextureName(-1U),
         mPremultipliedAlpha(true),
         mName("unnamed"),
+#ifdef PATCH_FOR_SLSIAP
+	mIsStrictMode(false),
+#endif
         mDebug(false),
         mFormat(PIXEL_FORMAT_NONE),
         mOpaqueLayer(true),
@@ -92,6 +95,9 @@ Layer::Layer(SurfaceFlinger* flinger, const sp<Client>& client,
         mPremultipliedAlpha = false;
 
     mName = name;
+#ifdef PATCH_FOR_SLSIAP
+    mIsStrictMode = mName == "StrictModeFlash";
+#endif
 
     mCurrentState.active.w = w;
     mCurrentState.active.h = h;
@@ -540,6 +546,47 @@ void Layer::onDraw(const sp<const DisplayDevice>& hw, const Region& clip) const
     } else {
         engine.setupLayerBlackedOut();
     }
+
+#ifdef PATCH_FOR_SLSIAP
+    if (mIsStrictMode) {
+	    Rect rect = clip.bounds();
+	    int margin = 20;
+
+	    Rect calcRect;
+	    calcRect.left = 0;
+	    calcRect.top = 0;
+	    calcRect.right = rect.right;
+	    calcRect.bottom = margin;
+	    Region region1(calcRect);
+	    clearWithOpenGL(hw, region1, 1, 0, 0, 1);
+
+	    calcRect.right = margin;
+	    calcRect.bottom = rect.bottom;
+	    Region region2(calcRect);
+	    clearWithOpenGL(hw, region2, 1, 0, 0, 1);
+
+	    calcRect.left = rect.right - margin;
+	    calcRect.right = rect.right;
+	    calcRect.bottom = rect.bottom;
+	    Region region3(calcRect);
+	    clearWithOpenGL(hw, region3, 1, 0, 0, 1);
+
+	    calcRect.left = 0;
+	    calcRect.right = rect.right;
+	    calcRect.top = rect.bottom - margin;
+	    calcRect.bottom = rect.bottom;
+	    Region region4(calcRect);
+	    clearWithOpenGL(hw, region4, 1, 0, 0, 1);
+
+	    calcRect.left = margin;
+	    calcRect.right = rect.right - margin;
+	    calcRect.top = margin;
+	    calcRect.bottom = rect.bottom - margin;
+	    Region region5(calcRect);
+	    clearWithOpenGL(hw, region5, 0, 0, 0, 0);
+    }
+#endif
+
     drawWithOpenGL(hw, clip);
     engine.disableTexturing();
 }
@@ -550,6 +597,23 @@ void Layer::clearWithOpenGL(const sp<const DisplayDevice>& hw, const Region& cli
 {
     RenderEngine& engine(mFlinger->getRenderEngine());
     computeGeometry(hw, mMesh);
+#ifdef PATCH_FOR_SLSIAP
+    if (mIsStrictMode) {
+	    const Layer::State& s(getDrawingState());
+	    const Transform tr(hw->getTransform() * s.transform);
+	    const uint32_t hw_h = hw->getHeight();
+	    Rect win(s.active.w, s.active.h);
+	    win.intersect(clip.bounds(), &win);
+	    Mesh::VertexArray<vec2> position(mMesh.getPositionArray<vec2>());
+	    position[0] = tr.transform(win.left,  win.top);
+	    position[1] = tr.transform(win.left,  win.bottom);
+	    position[2] = tr.transform(win.right, win.bottom);
+	    position[3] = tr.transform(win.right, win.top);
+	    for (size_t i=0 ; i<4 ; i++) {
+	        position[i].y = hw_h - position[i].y;
+	    }
+    }
+#endif
     engine.setupFillWithColor(red, green, blue, alpha);
     engine.drawMesh(mMesh);
 }

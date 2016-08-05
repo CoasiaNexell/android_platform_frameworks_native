@@ -333,6 +333,9 @@ private:
     uint32_t mTextureName;
     bool mPremultipliedAlpha;
     String8 mName;
+#ifdef PATCH_FOR_SLSIAP
+    bool mIsStrictMode;
+#endif
     mutable bool mDebug;
     PixelFormat mFormat;
     bool mOpaqueLayer;
