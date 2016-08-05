@@ -917,7 +917,9 @@ void SurfaceFlinger::doDebugFlashRegions()
             const Region dirtyRegion(hw->getDirtyRegion(repaintEverything));
             if (!dirtyRegion.isEmpty()) {
                 // redraw the whole screen
+#ifndef PATCH_FOR_SLSIAP
                 doComposeSurfaces(hw, Region(hw->bounds()));
+#endif
 
                 // and draw the dirty region
                 const int32_t height = hw->getHeight();
@@ -1153,7 +1155,7 @@ void SurfaceFlinger::postFramebuffer()
     }
 
 #ifdef PATCH_FOR_SLSIAP
-    if (hwc.hasGlesComposition(0))
+    if (hwc.hasGlesComposition(0) && !mDebugRegion)
         hwc.wait_commit();
 #endif
 
