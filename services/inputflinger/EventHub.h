@@ -38,6 +38,9 @@
 #include <linux/input.h>
 #include <sys/epoll.h>
 
+#ifdef HAVE_TSLIB
+#include "tslib-private.h"
+#endif
 /* Convenience constants. */
 
 #define BTN_FIRST 0x100  // first button code
@@ -450,6 +453,9 @@ private:
     bool mPendingINotify;
 
     bool mUsingEpollWakeup;
+#ifdef HAVE_TSLIB
+    struct tsdev *mTS;
+#endif
 };
 
 }; // namespace android
