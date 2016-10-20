@@ -210,7 +210,7 @@ status_t BnServiceManager::onTransact(
             String16 which = data.readString16();
             sp<IBinder> b = data.readStrongBinder();
             status_t err = addService(which, b);
-//          reply->writeInt32(err);
+            reply->writeInt32(err);
             return NO_ERROR;
         } break;
         case LIST_SERVICES_TRANSACTION: {
