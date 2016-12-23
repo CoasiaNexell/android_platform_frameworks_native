@@ -127,6 +127,10 @@ LOCAL_LDFLAGS := -Wl,--version-script,art/sigchainlib/version-script.txt -Wl,--e
 LOCAL_CFLAGS:= -DLOG_TAG=\"SurfaceFlinger\"
 LOCAL_CPPFLAGS:= -std=c++11
 
+ifeq ($(BOARD_USES_TSLIB),true)
+    LOCAL_CFLAGS += -DHAVE_TSLIB
+endif
+
 LOCAL_SRC_FILES:= \
 	main_surfaceflinger.cpp
 
