@@ -850,10 +850,9 @@ int HWComposer::fbPost(int32_t id,
         status_t ret = setFramebufferTarget(id, acquireFence, buffer);
         if (ret != NO_ERROR)
             return ret;
-	if (mNumDisplays > 1 && hasGlesComposition(1) && id == 1)
-		commit();
-	else if (id == 0 && hasGlesComposition(0))
-		commit();
+        if (id == 0 && hasGlesComposition(0)) {
+            commit();
+        }
         return NO_ERROR;
 #else
         return setFramebufferTarget(id, acquireFence, buffer);
