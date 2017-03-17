@@ -297,6 +297,10 @@ void SurfaceFlinger::bootFinished()
     // can choose where to stop the animation.
     property_set("service.bootanim.exit", "1");
 
+#ifdef PATCH_FOR_SLSIAP
+    property_set("ctl.start", "defer");
+#endif
+
 #ifdef HAVE_TSLIB
     property_set("persist.calibration.state", "done");
 #endif
