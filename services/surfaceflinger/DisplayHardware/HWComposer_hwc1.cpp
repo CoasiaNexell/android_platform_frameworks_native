@@ -657,7 +657,7 @@ status_t HWComposer::setFramebufferTarget(int32_t id,
     disp.fbTargetHandle = buf->handle;
     disp.framebufferTarget->handle = disp.fbTargetHandle;
     disp.framebufferTarget->acquireFenceFd = acquireFenceFd;
-    return NO_ERROR;
+    return mHwc->setFramebufferTarget(mHwc, id, disp.framebufferTarget);
 }
 
 status_t HWComposer::prepare() {
@@ -785,8 +785,6 @@ status_t HWComposer::commit() {
                         disp.outbufAcquireFence->dup();
             }
         }
-
-        err = mHwc->set(mHwc, mNumDisplays, mLists);
 
         for (size_t i=0 ; i<mNumDisplays ; i++) {
             DisplayData& disp(mDisplayData[i]);
