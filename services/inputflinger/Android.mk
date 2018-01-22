@@ -44,6 +44,12 @@ LOCAL_EXPORT_C_INCLUDE_DIRS := $(LOCAL_PATH)
 
 LOCAL_MODULE := libinputflinger
 
+ifeq ($(BOARD_USES_TSLIB),true)
+LOCAL_CFLAGS += -DHAVE_TSLIB
+LOCAL_SHARED_LIBRARIES += libts
+LOCAL_C_INCLUDES += external/tslib/src
+endif
+
 include $(BUILD_SHARED_LIBRARY)
 
 include $(call all-makefiles-under,$(LOCAL_PATH))
