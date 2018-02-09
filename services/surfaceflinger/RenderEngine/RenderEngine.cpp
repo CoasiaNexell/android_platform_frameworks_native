@@ -134,6 +134,7 @@ RenderEngine* RenderEngine::create(EGLDisplay display, int hwcFormat) {
     }
     engine->setEGLHandles(config, ctxt);
 
+#ifndef QUICKBOOT
     ALOGI("OpenGL ES informations:");
     ALOGI("vendor    : %s", extensions.getVendor());
     ALOGI("renderer  : %s", extensions.getRenderer());
@@ -141,6 +142,7 @@ RenderEngine* RenderEngine::create(EGLDisplay display, int hwcFormat) {
     ALOGI("extensions: %s", extensions.getExtension());
     ALOGI("GL_MAX_TEXTURE_SIZE = %zu", engine->getMaxTextureSize());
     ALOGI("GL_MAX_VIEWPORT_DIMS = %zu", engine->getMaxViewportDims());
+#endif
 
     eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
     eglDestroySurface(display, dummy);
@@ -420,6 +422,7 @@ EGLConfig RenderEngine::chooseEglConfig(EGLDisplay display, int format) {
         }
     }
 
+#ifndef QUICKBOOT
     // print some debugging info
     EGLint r,g,b,a;
     eglGetConfigAttrib(display, config, EGL_RED_SIZE,   &r);
@@ -432,6 +435,7 @@ EGLConfig RenderEngine::chooseEglConfig(EGLDisplay display, int format) {
     ALOGI("extensions: %s", eglQueryString(display, EGL_EXTENSIONS));
     ALOGI("Client API: %s", eglQueryString(display, EGL_CLIENT_APIS)?:"Not Supported");
     ALOGI("EGLSurface: %d-%d-%d-%d, config=%p", r, g, b, a, config);
+#endif
 
     return config;
 }

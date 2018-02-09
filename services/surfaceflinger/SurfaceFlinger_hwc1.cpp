@@ -162,6 +162,7 @@ SurfaceFlinger::SurfaceFlinger()
 {
     ALOGI("SurfaceFlinger is starting");
 
+#ifndef QUICKBOOT
     // debugging stuff...
     char value[PROPERTY_VALUE_MAX];
 
@@ -185,6 +186,12 @@ SurfaceFlinger::SurfaceFlinger()
     property_get("debug.sf.disable_hwc_vds", value, "0");
     mUseHwcVirtualDisplays = !atoi(value);
     ALOGI_IF(!mUseHwcVirtualDisplays, "Disabling HWC virtual displays");
+#else
+    mGpuToCpuSupported = 1;
+    mDebugRegion = 0;
+    mDebugDDMS = 0;
+    mUseHwcVirtualDisplays = 1;
+#endif
 }
 
 void SurfaceFlinger::onFirstRef()
