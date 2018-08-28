@@ -162,6 +162,18 @@ SurfaceFlinger::SurfaceFlinger()
 {
     ALOGI("SurfaceFlinger is starting");
 
+#ifdef QUICKBOOT
+    int fdDmesg = open("/dev/kmsg", O_WRONLY);
+    if (fdDmesg > 0) {
+        static const char _message[] = { '<', '0', '3', '>',
+            'S', 'u', 'r', 'f', 'a', 'c', 'e', 'F', 'l', 'i', 'n', 'g', 'e',
+            'r', ' ', 'i', 's', ' ', 's', 't', 'a', 'r', 't', 'i', 'n', 'g',
+            '\n' };
+        write(fdDmesg, _message, sizeof(_message));
+        close(fdDmesg);
+    }
+#endif
+
 #ifndef QUICKBOOT
     // debugging stuff...
     char value[PROPERTY_VALUE_MAX];
