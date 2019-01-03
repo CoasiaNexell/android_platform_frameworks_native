@@ -162,6 +162,18 @@ SurfaceFlinger::SurfaceFlinger()
 {
     ALOGI("SurfaceFlinger is starting");
 
+#ifdef QUICKBOOT
+    int fdDmesg = open("/dev/kmsg", O_WRONLY);
+    if (fdDmesg > 0) {
+        static const char _message[] = { '<', '0', '3', '>',
+            'S', 'u', 'r', 'f', 'a', 'c', 'e', 'F', 'l', 'i', 'n', 'g', 'e',
+            'r', ' ', 'i', 's', ' ', 's', 't', 'a', 'r', 't', 'i', 'n', 'g',
+            '\n' };
+        write(fdDmesg, _message, sizeof(_message));
+        close(fdDmesg);
+    }
+#endif
+
 #ifndef QUICKBOOT
     // debugging stuff...
     char value[PROPERTY_VALUE_MAX];
@@ -302,6 +314,16 @@ void SurfaceFlinger::bootFinished()
     const nsecs_t now = systemTime();
     const nsecs_t duration = now - mBootTime;
     ALOGI("Boot is finished (%ld ms)", long(ns2ms(duration)) );
+#ifdef QUICKBOOT
+    int fdDmesg = open("/dev/kmsg", O_WRONLY);
+    if (fdDmesg > 0) {
+        static const char _message2[] = { '<', '0', '3', '>',
+            'B', 'o', 'o', 't', ' ', 'i', 's', ' ', 'f', 'i', 'n', 'i', 's',
+            'h', 'e', 'd', '\n' };
+        write(fdDmesg, _message2, sizeof(_message2));
+        close(fdDmesg);
+    }
+#endif
     mBootFinished = true;
 
     // wait patiently for the window manager death
