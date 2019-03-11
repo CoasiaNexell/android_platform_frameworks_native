@@ -100,7 +100,7 @@ cc_binary {
         "dumpstate.cpp",
         "main.cpp",
     ],
-    init_rc: ["dumpstate.rc"],
+    // init_rc: ["dumpstate.rc"],
 }
 
 cc_test {

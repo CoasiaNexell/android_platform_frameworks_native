@@ -57,5 +57,5 @@ cc_binary {
         "-Wunreachable-code",
     ],
 
-    init_rc: ["thermalservice.rc"],
+    // init_rc: ["thermalservice.rc"],
 }

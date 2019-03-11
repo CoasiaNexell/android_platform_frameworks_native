@@ -21,11 +21,11 @@ cc_binary {
         "libpdx_default_transport",
     ],
 
-    init_rc: ["atrace.rc"],
-
-    product_variables: {
-        debuggable: {
-            init_rc: ["atrace_userdebug.rc"],
-        },
-    },
+    /* init_rc: ["atrace.rc"], */
+    /*  */
+    /* product_variables: { */
+    /*     debuggable: { */
+    /*         init_rc: ["atrace_userdebug.rc"], */
+    /*     }, */
+    /* }, */
 }
