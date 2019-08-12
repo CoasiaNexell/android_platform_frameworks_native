@@ -45,7 +45,11 @@ LOCAL_MODULE:= otapreopt_slot
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE_CLASS := EXECUTABLES
 LOCAL_SRC_FILES := otapreopt_slot.sh
+ifeq ($(NEXELL_QUICKBOOT), false)
 LOCAL_INIT_RC := otapreopt.rc
+else
+LOCAL_INIT_RC := otapreoptq.rc
+endif
 
 include $(BUILD_PREBUILT)
 
