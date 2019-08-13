@@ -21,9 +21,10 @@ cc_binary {
         "libpdx_default_transport",
     ],
 
-    init_rc: ["atrace.rc"],
-
     product_variables: {
+        normalboot: {
+            init_rc: ["atrace.rc"],
+        },
         debuggable: {
             init_rc: ["atrace_userdebug.rc"],
         },

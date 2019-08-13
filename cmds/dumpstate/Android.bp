@@ -100,7 +100,11 @@ cc_binary {
         "dumpstate.cpp",
         "main.cpp",
     ],
-    init_rc: ["dumpstate.rc"],
+    product_variables: {
+        normalboot: {
+            init_rc: ["dumpstate.rc"],
+        },
+    },
 }
 
 cc_test {

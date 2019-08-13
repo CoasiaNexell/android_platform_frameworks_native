@@ -57,5 +57,9 @@ cc_binary {
         "-Wunreachable-code",
     ],
 
-    init_rc: ["thermalservice.rc"],
+    product_variables: {
+        normalboot: {
+            init_rc: ["thermalservice.rc"],
+        },
+    },
 }
