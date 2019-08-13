@@ -160,7 +160,14 @@ cc_library_shared {
 cc_binary {
     name: "surfaceflinger",
     defaults: ["surfaceflinger_defaults"],
-    init_rc: ["surfaceflinger.rc"],
+    product_variables: {
+        quickboot: {
+            init_rc: ["surfaceflingerq.rc"],
+        },
+        normalboot: {
+            init_rc: ["surfaceflinger.rc"],
+        },
+    },
     srcs: ["main_surfaceflinger.cpp"],
     whole_static_libs: [
         "libsigchain",
