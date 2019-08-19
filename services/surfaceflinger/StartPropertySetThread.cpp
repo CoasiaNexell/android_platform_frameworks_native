@@ -16,6 +16,10 @@
 
 #include <cutils/properties.h>
 #include "StartPropertySetThread.h"
+#ifdef QUICKBOOT
+#include <unistd.h>
+#include <fcntl.h>
+#endif
 
 namespace android {
 
@@ -32,6 +36,15 @@ bool StartPropertySetThread::threadLoop() {
     // Clear BootAnimation exit flag
     property_set("service.bootanim.exit", "0");
     // Start BootAnimation if not started
+#ifdef QUICKBOOT
+    int fdDmesg = open("/dev/kmsg", O_WRONLY);
+    if (fdDmesg > 0) {
+        static const char _message[] = { '<', '0', '1', '>',
+            'R', 'u', 'n', ' ', 'B', 'o', 'o', 't', 'a', 'n', 'i', 'm', '\n' };
+        write(fdDmesg, _message, sizeof(_message));
+        close(fdDmesg);
+    }
+#endif
     property_set("ctl.start", "bootanim");
     // Exit immediately
     return false;

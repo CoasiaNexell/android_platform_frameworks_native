@@ -34,6 +34,7 @@
 
 using namespace android;
 
+#ifndef QUICKBOOT
 static status_t startGraphicsAllocatorService() {
     using android::hardware::configstore::getBool;
     using android::hardware::configstore::V1_0::ISurfaceFlingerConfigs;
@@ -53,6 +54,7 @@ static status_t startGraphicsAllocatorService() {
 
     return OK;
 }
+#endif
 
 static status_t startDisplayService() {
     using android::frameworks::displayservice::V1_0::implementation::DisplayService;
@@ -74,7 +76,9 @@ int main(int, char**) {
     hardware::configureRpcThreadpool(1 /* maxThreads */,
             false /* callerWillJoin */);
 
+#ifndef QUICKBOOT
     startGraphicsAllocatorService();
+#endif
 
     // When SF is launched in its own process, limit the number of
     // binder threads to 4.

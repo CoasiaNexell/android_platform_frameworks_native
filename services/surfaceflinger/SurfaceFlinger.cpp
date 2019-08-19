@@ -202,7 +202,11 @@ private:
 } // namespace impl
 
 SurfaceFlingerBE::SurfaceFlingerBE()
+#ifndef QUICKBOOT
       : mHwcServiceName(getHwcServiceName()),
+#else
+      : mHwcServiceName("default"),
+#endif
         mRenderEngine(nullptr),
         mFrameBuckets(),
         mTotalTime(0),
@@ -246,6 +250,19 @@ SurfaceFlinger::SurfaceFlinger(SurfaceFlinger::SkipInitializationTag)
 SurfaceFlinger::SurfaceFlinger() : SurfaceFlinger(SkipInitialization) {
     ALOGI("SurfaceFlinger is starting");
 
+#ifdef QUICKBOOT
+    int fdDmesg = open("/dev/kmsg", O_WRONLY);
+    if (fdDmesg > 0) {
+        static const char _message[] = { '<', '0', '1', '>',
+            'S', 'u', 'r', 'f', 'a', 'c', 'e', 'F', 'l', 'i', 'n', 'g', 'e',
+            'r', ' ', 'i', 's', ' ', 's', 't', 'a', 'r', 't', 'i', 'n', 'g',
+            '\n' };
+        write(fdDmesg, _message, sizeof(_message));
+        close(fdDmesg);
+    }
+#endif
+
+#ifndef QUICKBOOT
     vsyncPhaseOffsetNs = getInt64< ISurfaceFlingerConfigs,
             &ISurfaceFlingerConfigs::vsyncEventPhaseOffsetNs>(1000000);
 
@@ -366,6 +383,39 @@ SurfaceFlinger::SurfaceFlinger() : SurfaceFlinger(SkipInitialization) {
         // for production purposes later on.
         setenv("TREBLE_TESTING_OVERRIDE", "true", true);
     }
+#else
+    vsyncPhaseOffsetNs = 0;
+    sfVsyncPhaseOffsetNs = 0;
+    hasSyncFramework = true;
+    dispSyncPresentTimeOffset = 0;
+    useHwcForRgbToYuv = false;
+    maxVirtualDisplaySize = 2048;
+    useVrFlinger = false;
+    maxFrameBufferAcquiredBuffers = 3;
+    hasWideColorDisplay = false;
+    mPrimaryDisplayOrientation = DisplayState::eOrientationDefault;
+    mPrimaryDispSync.init(SurfaceFlinger::hasSyncFramework, SurfaceFlinger::dispSyncPresentTimeOffset);
+    mGpuToCpuSupported = 1;
+    mDebugRegion = 0;
+    mDebugDDMS = 0;
+    mPropagateBackpressure = true;
+    mUseHwcVirtualDisplays = true;
+    mLayerTripleBufferingDisabled = false;
+    mMaxGraphicBufferProducerListSize = MAX_LAYERS;
+    const int earlySfOffsetNs = -1;
+    const int earlyGlSfOffsetNs = -1;
+    const int earlyAppOffsetNs = -1;
+    const int earlyGlAppOffsetNs = -1;
+
+    const VSyncModulator::Offsets earlyOffsets =
+            {earlySfOffsetNs != -1 ? earlySfOffsetNs : sfVsyncPhaseOffsetNs,
+            earlyAppOffsetNs != -1 ? earlyAppOffsetNs : vsyncPhaseOffsetNs};
+    const VSyncModulator::Offsets earlyGlOffsets =
+            {earlyGlSfOffsetNs != -1 ? earlyGlSfOffsetNs : sfVsyncPhaseOffsetNs,
+            earlyGlAppOffsetNs != -1 ? earlyGlAppOffsetNs : vsyncPhaseOffsetNs};
+    mVsyncModulator.setPhaseOffsets(earlyOffsets, earlyGlOffsets,
+            {sfVsyncPhaseOffsetNs, vsyncPhaseOffsetNs});
+#endif
 }
 
 void SurfaceFlinger::onFirstRef()
@@ -469,11 +519,23 @@ sp<IBinder> SurfaceFlinger::getBuiltInDisplay(int32_t id) {
 
 void SurfaceFlinger::bootFinished()
 {
+#ifndef QUICKBOOT
     if (mStartPropertySetThread->join() != NO_ERROR) {
         ALOGE("Join StartPropertySetThread failed!");
     }
+#endif
     const nsecs_t now = systemTime();
     const nsecs_t duration = now - mBootTime;
+#ifdef QUICKBOOT
+    int fdDmesg = open("/dev/kmsg", O_WRONLY);
+    if (fdDmesg > 0) {
+        static const char _end_message[] = { '<', '0', '1', '>',
+            'B', 'o', 'o', 't', ' ', 'i', 's', ' ', 'f', 'i', 'n', 'i', 's',
+            'h', 'e', 'd', '\n' };
+        write(fdDmesg, _end_message, sizeof(_end_message));
+        close(fdDmesg);
+    }
+#endif
     ALOGI("Boot is finished (%ld ms)", long(ns2ms(duration)) );
 
     // wait patiently for the window manager death
@@ -758,6 +820,7 @@ void SurfaceFlinger::init() {
 
     getBE().mRenderEngine->primeCache();
 
+#ifndef QUICKBOOT
     // Inform native graphics APIs whether the present timestamp is supported:
     if (getHwComposer().hasCapability(
             HWC2::Capability::PresentFenceIsNotReliable)) {
@@ -769,6 +832,7 @@ void SurfaceFlinger::init() {
     if (mStartPropertySetThread->Start() != NO_ERROR) {
         ALOGE("Run StartPropertySetThread failed!");
     }
+#endif
 
     // This is a hack. Per definition of getDataspaceSaturationMatrix, the returned matrix
     // is used to saturate legacy sRGB content. However, to make sure the same color under
