@@ -530,8 +530,8 @@ void SurfaceFlinger::bootFinished()
     int fdDmesg = open("/dev/kmsg", O_WRONLY);
     if (fdDmesg > 0) {
         static const char _end_message[] = { '<', '0', '1', '>',
-            'B', 'o', 'o', 't', ' ', 'i', 's', ' ', 'f', 'i', 'n', 'i', 's',
-            'h', 'e', 'd', '\n' };
+            '\n', 'B', 'o', 'o', 't', ' ', 'i', 's', ' ', 'f', 'i', 'n', 'i',
+            's', 'h', 'e', 'd', '\n' };
         write(fdDmesg, _end_message, sizeof(_end_message));
         close(fdDmesg);
     }
