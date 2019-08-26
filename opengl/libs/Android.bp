@@ -109,6 +109,16 @@ cc_defaults {
             exclude_shared_libs: ["libgraphicsenv"],
         },
     },
+    product_variables: {
+        quickboot: {
+            cppflags: [
+                "-DQUICKBOOT",
+            ],
+            cflags: [
+                "-DQUICKBOOT",
+            ]
+        },
+    },
 }
 
 cc_library_static {

@@ -221,8 +221,12 @@ EGLBoolean egl_display_t::initialize(EGLint *major, EGLint *minor) {
                     "EGL_EXT_gl_colorspace_display_p3_linear EGL_EXT_gl_colorspace_display_p3 ");
         }
 
+#ifndef QUICKBOOT
         bool hasHdrBoardConfig =
                 getBool<ISurfaceFlingerConfigs, &ISurfaceFlingerConfigs::hasHDRDisplay>(false);
+#else
+        bool hasHdrBoardConfig = false;
+#endif
 
         if (hasHdrBoardConfig && hasColorSpaceSupport) {
             // hasHDRBoardConfig indicates the system is capable of supporting HDR content.

@@ -81,6 +81,14 @@ cc_library_shared {
                 "-DDEBUG_ONLY_CODE=1",
             ],
         },
+        quickboot: {
+            cppflags: [
+                "-DQUICKBOOT",
+            ],
+            cflags: [
+                "-DQUICKBOOT",
+            ]
+        },
     },
 
     srcs: [

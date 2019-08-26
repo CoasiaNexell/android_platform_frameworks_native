@@ -325,6 +325,7 @@ using namespace android::hardware::configstore;
 using namespace android::hardware::configstore::V1_0;
 
 status_t Surface::getWideColorSupport(bool* supported) {
+#ifndef QUICKBOOT
     ATRACE_CALL();
 
     sp<IBinder> display(
@@ -354,6 +355,9 @@ status_t Surface::getWideColorSupport(bool* supported) {
                 break;
         }
     }
+#else
+    *supported = false;
+#endif
 
     return NO_ERROR;
 }
