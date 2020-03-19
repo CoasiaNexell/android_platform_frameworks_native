@@ -110,7 +110,7 @@ cc_defaults {
         },
     },
     product_variables: {
-        quickboot: {
+        openglQuickboot: {
             cppflags: [
                 "-DQUICKBOOT",
             ],

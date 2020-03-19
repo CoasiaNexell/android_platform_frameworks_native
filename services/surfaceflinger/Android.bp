@@ -156,7 +156,7 @@ cc_library_shared {
         thin: true,
     },
     product_variables: {
-        quickboot: {
+        surfaceFlingerQuickboot: {
             cppflags: [
                 "-DQUICKBOOT",
             ],
@@ -171,7 +171,7 @@ cc_binary {
     name: "surfaceflinger",
     defaults: ["surfaceflinger_defaults"],
     product_variables: {
-        quickboot: {
+        surfaceFlingerQuickboot: {
             init_rc: ["surfaceflingerq.rc"],
             cppflags: [
                 "-DQUICKBOOT",
