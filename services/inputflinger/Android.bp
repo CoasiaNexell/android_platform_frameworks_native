@@ -35,6 +35,13 @@ cc_library_shared {
         "libutils",
         "libui",
         "libhardware_legacy",
+        // psw0523: below is only for navi_ref, avn_ref board
+        "libts",
+    ],
+
+    // psw0523: below is only for navi_ref, avn_ref board
+    include_dirs: [
+        "vendor/nexell/external/tslib/src",
     ],
 
     cflags: [
@@ -42,6 +49,8 @@ cc_library_shared {
         "-Wextra",
         "-Werror",
         "-Wno-unused-parameter",
+		// psw0523: below is only for navi_ref, avn_ref board
+		"-DHAVE_TSLIB",
         // TODO: Move inputflinger to its own process and mark it hidden
         //-fvisibility=hidden
     ],
